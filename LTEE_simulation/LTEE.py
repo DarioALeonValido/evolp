@@ -60,6 +60,13 @@ genF, mutF = Read_Two_Column_File(datapath+file_mutF,4)
 genSNP, fr = Read_SNP_File(datapath+file_SNP,3)
 mutT = Compute_MutT(genF, mutF, genSNP, fr)
 
+#------------------------------------------------------
+
+with open("Ara-1_mut-total_dat.dat", "w+") as file:
+    file.write("Number of total mutations in mixed-population samples\n\n")
+    file.write(" gen\tnum\n")
+    for x in zip(genF, mutT):
+        file.write(" {0}\t{1}\n".format(*x))
 
 
 # Plots ..............................................
