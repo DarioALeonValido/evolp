@@ -10,8 +10,9 @@ from pylab import *
 #from netCDF4 import Dataset
 
 datapath="../external_databases/LTEE/" 
-file_mutF = "Ara-1_mut-fixed.dat"
-file_SNP = "Ara-1_mut-SNP.dat"
+file_A1_mutF = "Ara-1_mut-SP_fixed.dat"
+file_A1_SNP = "Ara-1_mut-SNP.dat"
+file_A1_LR = "Ara-1_mut-LR.dat"
 
 def Read_Two_Column_File(file_name,lines):
     with open(file_name, 'r') as rfile:
@@ -44,6 +45,28 @@ def Read_SNP_File(file_name,lines):
 
     return gen, fr
 
+def Read_A1_LR_File(file_name,lines):
+    with open(file_name, 'r') as rfile:
+        data = rfile.readlines()[lines:]
+        gen = []
+        num = []
+        size = []
+        igen = 0 
+        size.append([])
+        for line in data:
+            if line.startswith("g"):
+            	p = line.split()
+            	num.append(0)
+            	gen.append(int(p[1]))
+            elif line =='\n': 
+            	igen = igen + 1
+            	size.append([])
+            else:
+            	num[igen] = num[igen] + 1
+            	size[igen].append(int(line))
+
+    return gen, num, size
+
 def Compute_MutT(genF, mutF, genSNP, fr):
     if genSNP != genF:
     	print("The sampling of the SNP doesn't match the sampling of the fixed mutations")
@@ -56,13 +79,15 @@ def Compute_MutT(genF, mutF, genSNP, fr):
 #------------------------------------------------------
 
 
-genF, mutF = Read_Two_Column_File(datapath+file_mutF,4)
-genSNP, fr = Read_SNP_File(datapath+file_SNP,3)
+genF, mutF = Read_Two_Column_File(datapath+file_A1_mutF,4)
+genSNP, fr = Read_SNP_File(datapath+file_A1_SNP,3)
 mutT = Compute_MutT(genF, mutF, genSNP, fr)
+genLR, numLR, sizeLR = Read_A1_LR_File(datapath+file_A1_LR,3)
+
 
 #------------------------------------------------------
 
-with open("Ara-1_mut-total_dat.dat", "w+") as file:
+with open("Ara-1_mut-SP_total_dat.dat", "w+") as file:
     file.write("Number of total mutations in mixed-population samples\n\n")
     file.write(" gen\tnum\n")
     for x in zip(genF, mutT):
@@ -94,13 +119,13 @@ plt.ylabel('Number of SPMs')
 plt.tight_layout()
 plt.legend()
 plt.xlim(0, 20250)
-plt.savefig('mut_20K_fig.pdf')
+plt.savefig('mut-SP_20K_fig.pdf')
 #plt.show() 
 
 # clear the plot
 plt.clf()
 
-# plotting up to 40K 
+# plotting SP up to 40K 
 plt.axvline(x=27000,color='gray',linestyle='dotted')
 
 plt.plot(genF, mutF, 
@@ -125,5 +150,28 @@ plt.xlabel('gen')
 plt.ylabel('Number of SPMs')
 plt.tight_layout()
 plt.legend()
-plt.savefig('mut_40K_fig.pdf')
+plt.savefig('mut-SP_40K_fig.pdf')
 #plt.show() 
+
+
+# clear the plot
+plt.clf()
+
+# plotting LR up to 50K 
+
+plt.plot(genLR, numLR, 
+label = "Ara-1",
+#color='green', 
+#linestyle='dashed', 
+#linewidth = 3, 
+marker='o' 
+#, markerfacecolor='blue', markersize=12
+)  
+
+plt.xlabel('gen') 
+plt.ylabel('Number of Rearrangements')
+plt.tight_layout()
+plt.legend()
+plt.savefig('mut-LR_50K_fig.pdf')
+#plt.show() 
+
