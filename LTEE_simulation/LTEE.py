@@ -13,6 +13,7 @@ datapath="../external_databases/LTEE/"
 file_A1_mutF = "Ara-1_mut-SP_fixed.dat"
 file_A1_SNP = "Ara-1_mut-SNP.dat"
 file_A1_LR = "Ara-1_mut-LR.dat"
+file_Aall_LR = "Ara-all_mut-LR.dat"
 
 def Read_Two_Column_File(file_name,lines):
     with open(file_name, 'r') as rfile:
@@ -67,17 +68,42 @@ def Read_A1_LR_File(file_name,lines):
 
     return gen, num, size
 
+def Read_Aall_LR_File(file_name,lines):
+    with open(file_name, 'r') as rfile:
+        data = rfile.readlines()[lines:]
+        popul = []
+        num = []
+        size = []
+        ipop = 0 
+        size.append([])
+        for line in data:
+            if line.startswith("p"):
+            	p = line.split()
+            	num.append(0)
+            	popul.append(p[1])
+            elif line =='\n': 
+            	ipop = ipop + 1
+            	size.append([])
+            else:
+            	num[ipop] = num[ipop] + 1
+            	size[ipop].append(int(line))
+
+        for i in range(len(size)):
+            size[i] = sort(size[i])
+
+    return popul, num, size
+
+
 def Compute_MutT(genF, mutF, genSNP, fr):
     if genSNP != genF:
-    	print("The sampling of the SNP doesn't match the sampling of the fixed mutations")
+    	print("Datadases: The sampling of the SNP doesn't match the sampling of the fixed mutations")
     mutT = []
     for i in range(len(genF)):
     	mutT.append( mutF[i] + sum(fr[i]) ) # similar to paper: Mutations as levy flights
 
     return mutT
 
-
-def Fill_SizeLR1(sizeLR):
+def Fill_SizeLR(sizeLR):
 
     def Included_In(value, array):
         included = False
@@ -100,17 +126,21 @@ def Fill_SizeLR1(sizeLR):
 
     return sizeLRu, cnumLRu
 
-#------------------------------------------------------
+# Filling arrays ------------------------------------------------------
 
 
 genF, mutF = Read_Two_Column_File(datapath+file_A1_mutF,4)
 genSNP, fr = Read_SNP_File(datapath+file_A1_SNP,3)
 mutT = Compute_MutT(genF, mutF, genSNP, fr)
 genLR, numLR, sizeLR = Read_A1_LR_File(datapath+file_A1_LR,3)
-sizeLRu, cnumLRu = Fill_SizeLR1(sizeLR)
+sizeLRu, cnumLRu = Fill_SizeLR(sizeLR)
+populN, numLRall, sizeLRall = Read_Aall_LR_File(datapath+file_Aall_LR,3)
+sizeLRjoined, cnumLRjoined = Fill_SizeLR(sizeLRall)
+for i in range(len(cnumLRjoined)):
+    cnumLRjoined[i] = cnumLRjoined[i]/len(populN)
 
-print(sizeLRu)
-print(cnumLRu)
+#print(sizeLRjoined)
+#print(cnumLRjoined)
 
 #------------------------------------------------------
 
@@ -121,8 +151,12 @@ with open("Ara-1_mut-SP_total_dat.dat", "w+") as file:
         file.write(" {0}\t{1}\n".format(*x))
 
 
-# Plots ..............................................
-# plotting the points 
+#.............................................#
+#                                             #
+#                  Plots                      #
+#                                             #
+#.............................................#
+
 plt.plot(genF[0:5], mutF[0:5], 
 label = "fixed",
 #color='green', 
@@ -248,3 +282,73 @@ plt.tight_layout()
 plt.legend()
 plt.savefig('mut-LR_sizeU_fig.pdf')
 #plt.show() 
+
+
+# clear the plot
+plt.clf()
+
+# plotting LR Ara-all each sizes at 40000 generations
+for i in range(len(numLRall)):
+    pnum = []
+    for j in range(numLRall[i]):
+        pnum.append(numLRall[i]-j)
+
+    plt.loglog(sizeLRall[i], pnum, 
+    label = populN[i],
+    #color='green', 
+    #linestyle='dashed', 
+    #linewidth = 3, 
+    marker='o' 
+    #, markerfacecolor='blue', markersize=12
+    )  
+
+plt.xlabel('size') 
+plt.ylabel('Ara: Cumulant Number of Rearrangements at 40K Generations')
+plt.tight_layout()
+plt.legend()
+plt.savefig('mut-LRall_size_fig.pdf')
+#plt.show() 
+
+# clear the plot
+plt.clf()
+
+# plotting LR Ara-all joined sizes at 40000 generations
+plt.loglog(sizeLRjoined, cnumLRjoined, 
+label = "Ara-all at 40K gen",
+#color='green', 
+#linestyle='dashed', 
+#linewidth = 3, 
+marker='o' 
+#, markerfacecolor='blue', markersize=12
+)  
+
+plt.xlabel('size') 
+plt.ylabel('Ara-all: Cumulant Number of All Rearrangements')
+plt.tight_layout()
+plt.legend()
+plt.savefig('mut-LRallj_size_fig.pdf')
+#plt.show() 
+
+
+# plotting LR Ara-all each sizes at 40000 generations
+for i in range(len(numLRall)):
+    pnum = []
+    for j in range(numLRall[i]):
+        pnum.append(numLRall[i]-j)
+
+    plt.loglog(sizeLRall[i], pnum, 
+    label = populN[i],
+    #color='green', 
+    #linestyle='dashed', 
+    #linewidth = 3, 
+    marker='o' 
+    #, markerfacecolor='blue', markersize=12
+    )  
+
+plt.xlabel('size') 
+plt.ylabel('Ara: Cumulant Number of Rearrangements at 40K Generations')
+plt.tight_layout()
+plt.legend()
+#plt.savefig('mut-LRall_size_fig.pdf')
+plt.show() 
+
