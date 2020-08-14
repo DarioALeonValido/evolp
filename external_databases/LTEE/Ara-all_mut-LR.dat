@@ -1,7 +1,7 @@
 Rearrangements detected in 40000-generation clones sampled from each of the 12 populations of the LTEE
 Size(bp)
 
-Population Ara+1
+population Ara+1
 2788574
 607496
 470659
@@ -14,7 +14,7 @@ Population Ara+1
 6093
 48892
 
-Population Ara+2
+population Ara+2
 6138
 40792
 1444004
@@ -28,14 +28,14 @@ Population Ara+2
 837
 15458
 
-Population Ara+3
+population Ara+3
 40792
 171581
 23293
 22146
 6164
 
-Population Ara+4
+population Ara+4
 11806
 12090
 23293
@@ -45,17 +45,17 @@ Population Ara+4
 3948
 179808
 
-Population Ara+5
+population Ara+5
 27055
 0
 22146
-39,627
-55,766
+39627
+55766
 283
-29,092
+29092
 0
 
-Population Ara+6
+population Ara+6
 8618
 9290
 6292
@@ -65,7 +65,7 @@ Population Ara+6
 20893
 5160
 
-Population Ara-1
+population Ara-1
 8176
 1493854
 23293
@@ -73,7 +73,7 @@ Population Ara-1
 8042
 6927
 
-Population Ara-2
+population Ara-2
 28644
 164027
 6292
@@ -83,7 +83,7 @@ Population Ara-2
 4901
 3471
 
-Population Ara-3
+population Ara-3
 2650
 6631
 2933
@@ -105,7 +105,7 @@ Population Ara-3
 345
 38943
 
-Population Ara-4
+population Ara-4
 71413
 164027
 6292
@@ -115,7 +115,7 @@ Population Ara-4
 834534
 6409
 
-Population Ara-5
+population Ara-5
 71
 10873
 1617342
@@ -124,7 +124,7 @@ Population Ara-5
 22146
 5624
 
-Population Ara-6
+population Ara-6
 41854
 11081
 13806
@@ -134,4 +134,3 @@ Population Ara-6
 739931
 188009
 21788
-

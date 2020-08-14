@@ -76,6 +76,30 @@ def Compute_MutT(genF, mutF, genSNP, fr):
 
     return mutT
 
+
+def Fill_SizeLR1(sizeLR):
+
+    def Included_In(value, array):
+        included = False
+        for i in range(len(array)):
+            if value == array[i]:
+            	included = True
+            	break
+        return included
+
+    sizeLRu = []
+    cnumLRu = []
+    sizeLRu.append(sizeLR[0][0])
+    for i in range(len(sizeLR)):
+        for j in range(len(sizeLR[i])):
+            if not Included_In(sizeLR[i][j], sizeLRu):
+            	sizeLRu.append(sizeLR[i][j])
+    sizeLRu = sort(sizeLRu)
+    for i in range(len(sizeLRu)):
+    	cnumLRu.append( len(sizeLRu) - i )
+
+    return sizeLRu, cnumLRu
+
 #------------------------------------------------------
 
 
@@ -83,7 +107,10 @@ genF, mutF = Read_Two_Column_File(datapath+file_A1_mutF,4)
 genSNP, fr = Read_SNP_File(datapath+file_A1_SNP,3)
 mutT = Compute_MutT(genF, mutF, genSNP, fr)
 genLR, numLR, sizeLR = Read_A1_LR_File(datapath+file_A1_LR,3)
+sizeLRu, cnumLRu = Fill_SizeLR1(sizeLR)
 
+print(sizeLRu)
+print(cnumLRu)
 
 #------------------------------------------------------
 
@@ -175,3 +202,49 @@ plt.legend()
 plt.savefig('mut-LR_50K_fig.pdf')
 #plt.show() 
 
+# clear the plot
+plt.clf()
+
+# plotting LR sizes per generation
+
+for i in range(len(numLR)):
+    sizeLRi = sizeLR[i]
+    pnum = []
+    for j in range(numLR[i]):
+        pnum.append((numLR[i]-j)/genLR[i])
+
+    plt.loglog(sizeLRi, pnum, 
+    label = "gen " + str(genLR[i]),
+    #color='green', 
+    #linestyle='dashed', 
+    #linewidth = 3, 
+    marker='o' 
+    #, markerfacecolor='blue', markersize=12
+    )  
+
+plt.xlabel('size') 
+plt.ylabel('Ara-1: Cumulant Number of Rearrangements / Generation')
+plt.tight_layout()
+plt.legend()
+plt.savefig('mut-LR_size_fig.pdf')
+#plt.show() 
+
+# clear the plot
+plt.clf()
+
+# plotting LR sizes
+plt.loglog(sizeLRu, cnumLRu, 
+label = "Ara-1 in 2-50K gen",
+#color='green', 
+#linestyle='dashed', 
+#linewidth = 3, 
+marker='o' 
+#, markerfacecolor='blue', markersize=12
+)  
+
+plt.xlabel('size') 
+plt.ylabel('Ara-1: Cumulant Number of All Rearrangements')
+plt.tight_layout()
+plt.legend()
+plt.savefig('mut-LR_sizeU_fig.pdf')
+#plt.show() 
