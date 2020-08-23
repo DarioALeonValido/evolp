@@ -137,9 +137,9 @@ sizeLRu, cnumLRu = Fill_SizeLR(sizeLR)
 populN, numLRall, sizeLRall = Read_Aall_LR_File(datapath+file_Aall_LR,3)
 sizeLRjoined, cnumLRjoined = Fill_SizeLR(sizeLRall)
 for i in range(len(cnumLRjoined)):
-    cnumLRjoined[i] = cnumLRjoined[i]/len(populN)
+    cnumLRjoined[i] = cnumLRjoined[i]/len(populN)/40000
 
-#print(sizeLRjoined)
+print(sizeLRall[8])
 #print(cnumLRjoined)
 
 #------------------------------------------------------
@@ -334,7 +334,7 @@ plt.savefig('mut-LRallj_size_fig.pdf')
 for i in range(len(numLRall)):
     pnum = []
     for j in range(numLRall[i]):
-        pnum.append(numLRall[i]-j)
+        pnum.append((numLRall[i]-j)/40000)
 
     plt.loglog(sizeLRall[i], pnum, 
     label = populN[i],
