@@ -11,6 +11,7 @@ from pylab import *
 
 datapath="../external_databases/LTEE/trajectories/" 
 file_Ws = "Ws.dat"
+file_Ms = "Ms.dat"
 
 def Read_Trajectories_File(file_name,lines):
     with open(file_name, 'r') as rfile:
@@ -47,6 +48,7 @@ def Read_Trajectories_File(file_name,lines):
 
 
 populWs, numWs, genWs, trajWs = Read_Trajectories_File(datapath+file_Ws,2)
+populMs, numMs, genMs, trajMs = Read_Trajectories_File(datapath+file_Ms,2)
 
 
 #------------------------------------------------------
@@ -73,6 +75,27 @@ plt.ylabel('Fitness')
 plt.tight_layout()
 plt.legend()
 plt.savefig('Ws_fig.png')
+#plt.show() 
+
+# clear the plot
+plt.clf()
+
+# plotting Ms
+for i in range(len(populMs)):
+    plt.plot(genMs[i], trajMs[i], 
+    label = populMs[i],
+    #color='green', 
+    #linestyle='dashed', 
+    #linewidth = 3, 
+    marker='o' 
+    #, markerfacecolor='blue', markersize=12
+    )  
+
+plt.xlabel('generations') 
+plt.ylabel('Mutations')
+plt.tight_layout()
+plt.legend()
+plt.savefig('Ms_fig.png')
 #plt.show() 
 
 
