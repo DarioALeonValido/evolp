@@ -11,9 +11,8 @@ DALV, AG
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-
 from pylab import *
-#from netCDF4 import Dataset
+
 
 # Names ----------------------------------------------------------
 
@@ -237,12 +236,12 @@ plt.savefig(plot_id+'mut-SP_40K_fig.pdf')
 plt.clf() # clear the plot
 
 
-# plotting LR up to 50K ----------------------------
+# plotting LR 2K to 50K ----------------------------
 
 plt.plot(genLR, numLR, 
 label = "Ara-1",
 #color='green', 
-#linestyle='dashed', 
+linestyle='dashed', 
 #linewidth = 3, 
 marker='o' 
 #, markerfacecolor='blue', markersize=12
@@ -262,7 +261,7 @@ plt.clf() # clear the plot
 plt.loglog(sizeLRu, cnumLRu, 
 label = "Ara-1 in 2-50K gen",
 #color='green', 
-#linestyle='dashed', 
+linestyle='dashed', 
 #linewidth = 3, 
 marker='o' 
 #, markerfacecolor='blue', markersize=12
