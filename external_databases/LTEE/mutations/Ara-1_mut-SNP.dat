@@ -1,5 +1,7 @@
-Single-nucleotide polymorphisms (SNPs) in mixed-population samples
-(4% < frequency < 96%)
+Single-nucleotide polymorphisms (SNPs) in mixed-population samples.
+Frequencies (4% < fr < 96%) extracted from tables S1-S7 of the 
+Supplementary Data for paper https://doi.org/10.1101/sqb.2009.74.018
+
 
 frequencies at generation 2000
 0.100
