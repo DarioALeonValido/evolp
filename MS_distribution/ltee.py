@@ -23,6 +23,7 @@ file_A1_LR = "Ara-1_mut-LR.dat"
 file_Aall_LR = "Ara-all_mut-LR.dat"
 plot_id = "ltee_"
 
+colors = ['#4A1486','#807DBA','#084594','#4292C6','#005A32','#41AB5D','#8C2D04','#CC4C02','#B10026','#E31A16','#FC4E2A','#FD8D3C']
 
 # Functions ------------------------------------------------------
 
@@ -172,7 +173,7 @@ with open(plot_id+"Ara-1_mut-SP_total_dat.dat", "w+") as file:
 
 plt.plot(genF[0:5], mutF[0:5], 
 label = "fixed",
-#color='green', 
+color=colors[2],
 linestyle='dashed', 
 #linewidth = 3, 
 marker='o' 
@@ -181,7 +182,7 @@ marker='o'
 
 plt.plot(genF[0:5], mutT[0:5], 
 label = "total",
-#color='orange', 
+color=colors[11], 
 #linestyle='dashed', 
 #linewidth = 3, 
 marker='o' 
@@ -211,7 +212,7 @@ plt.axvline(x=27000,color='gray',linestyle='dotted')
 
 plt.plot(genF, mutF, 
 label = "fixed",
-#color='green', 
+color=colors[2], 
 linestyle='dashed', 
 #linewidth = 3, 
 marker='o' 
@@ -220,7 +221,7 @@ marker='o'
 
 plt.plot(genF, mutT, 
 label = "total",
-#color='green', 
+color=colors[11],
 #linestyle='dashed', 
 #linewidth = 3, 
 marker='o' 
@@ -240,7 +241,7 @@ plt.clf() # clear the plot
 
 plt.plot(genLR, numLR, 
 label = "Ara-1",
-#color='green', 
+color=colors[2],
 linestyle='dashed', 
 #linewidth = 3, 
 marker='o' 
@@ -258,28 +259,30 @@ plt.clf() # clear the plot
 
 # plotting LR sizes --------------------------------------
 
-plt.loglog(sizeLRu, cnumLRu, 
-label = "Ara-1 in 2-50K gen",
-#color='green', 
-linestyle='dashed', 
+plt.loglog(sizeLRjoined, cnumLRjoined, 
+label = "Ara-all at 40K gen",
+color=colors[11], 
+#linestyle='dashed', 
 #linewidth = 3, 
+mfc='none',
 marker='o' 
 #, markerfacecolor='blue', markersize=12
 )  
 
-plt.loglog(sizeLRjoined, cnumLRjoined, 
-label = "Ara-all at 40K gen",
-#color='green', 
-#linestyle='dashed', 
+plt.loglog(sizeLRu, cnumLRu, 
+label = "Ara-1 in 2-50K gen",
+color=colors[2],
+linestyle='dashed', 
 #linewidth = 3, 
+mfc='none',
 marker='o' 
 #, markerfacecolor='blue', markersize=12
 )  
 
 plt.xlabel('size') 
-plt.ylabel('Cumulant Number of Rearrangements')
+plt.ylabel('Cumulative Probability of Large Rearrangements')
 plt.tight_layout()
-plt.legend()
+plt.legend(loc='upper right')
 plt.savefig(plot_id+'mut-LR_distribution_fig.pdf')
 #plt.show() 
 

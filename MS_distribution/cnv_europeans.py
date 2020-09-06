@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-At the moment, this script file reproduce some of the 
-figures present in paper doi:10.1038/nature24287
-refered to fitness and mutation data of the LTEE.
-
-Simulations of the experimental data will be release
-in further versions.
+This script file processes available CNV data 
+of over 100,000 European ancestry subjects.
+The output figure is similar to the one in paper
+arXiv:1605.09697
 
 For more details see author(s):
 DALV, AG
@@ -18,7 +16,7 @@ from pylab import *
 
 # Names ----------------------------------------------------------
 
-datapath="./" 
+datapath="../external_databases/CNV/" 
 file_cnv = "CNV.bed"
 
 
@@ -43,7 +41,7 @@ def Difference_Dist(x0,xf):
         for i in range(len(x0)):
             if(xf[i]>x0[i]):
                 diff.append(xf[i]-x0[i])
-                pcum.append(len(x0)-i)
+                pcum.append((len(x0)-i)/len(x0))
             else:
                 print('Found not positive different at position ',i)
         diff=sort(diff)
@@ -53,31 +51,33 @@ def Difference_Dist(x0,xf):
     return diff, pcum
 
 
-# Filling arrays ------------------------------------------------------
+# Manipulating the data -----------------------------------------------
 
-
+print("Processing CNV data of over 100,000 European ancestry subjects ...")
 start_hg18, end_hg18 = Read_Two_Column_From_File(datapath+file_cnv,1,2,3)
-print(start_hg18[1],end_hg18[1])
-print(-start_hg18[1]+end_hg18[1])
+print(len(start_hg18),"values were loaded!")
+print("10 secs more to compute and produce the plot")
 cnv_size, cnv_cprob = Difference_Dist(start_hg18,end_hg18)
 
 
 # Plots ---------------------------------------------------------------
 
-# plotting Ws ----------------------------
+# plotting dist ----------------------------
 plt.loglog(cnv_size, cnv_cprob, 
-label = 'Cumulantive Probability',
-#color='green', 
-#linestyle='dashed', 
+label = 'Cumulantive Number',
+color='#084594',
+#mfc='none',
+linestyle='none', 
 #linewidth = 3, 
 marker='o' 
-#, markerfacecolor='blue', markersize=12
+, markerfacecolor='none', markersize=2
 )  
 
 plt.xlabel('CNV size') 
-plt.ylabel('Cumulant Number of CNV in European ancestry subjects')
+plt.ylabel('Cumulative Number of CNV in European ancestry subjects')
 plt.tight_layout()
-plt.legend()
-plt.savefig('CNV_distribution_fig.png')
-#plt.show() 
+plt.legend(loc='upper right')
+plt.savefig('eur_CNV_distribution_fig.png')
+#plt.show()
 
+print("Job Done!") 
