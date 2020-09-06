@@ -1,17 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-This is a temporary script file.
+At the moment, this script file reproduce some of the 
+figures present in paper doi:10.1038/nature24287
+refered to fitness and mutation data of the LTEE.
+
+Simulations of the experimental data will be release
+in further versions.
+
+For more details see author(s):
+DALV, AG
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pylab import *
-#from netCDF4 import Dataset
+
+# Names ----------------------------------------------------------
 
 datapath="../external_databases/LTEE/trajectories/" 
 file_Ws = "Ws.dat"
 file_Ms = "Ms.dat"
+
+
+# Functions ------------------------------------------------------
 
 def Read_Trajectories_File(file_name,lines):
     with open(file_name, 'r') as rfile:
@@ -51,15 +62,9 @@ populWs, numWs, genWs, trajWs = Read_Trajectories_File(datapath+file_Ws,2)
 populMs, numMs, genMs, trajMs = Read_Trajectories_File(datapath+file_Ms,2)
 
 
-#------------------------------------------------------
+# Plots ---------------------------------------------------------------
 
-#.............................................#
-#                                             #
-#                  Plots                      #
-#                                             #
-#.............................................#
-
-# plotting Ws
+# plotting Ws ----------------------------
 for i in range(len(populWs)):
     plt.plot(genWs[i], trajWs[i], 
     label = populWs[i],
@@ -76,11 +81,11 @@ plt.tight_layout()
 plt.legend()
 plt.savefig('Ws_fig.png')
 #plt.show() 
+plt.clf() # clear the plot
 
-# clear the plot
-plt.clf()
 
-# plotting Ms
+# plotting Ms ----------------------------
+ 
 for i in range(len(populMs)):
     plt.plot(genMs[i], trajMs[i], 
     label = populMs[i],
@@ -98,4 +103,7 @@ plt.legend()
 plt.savefig('Ms_fig.png')
 #plt.show() 
 
+# Quick Note ----------------------------
+print("\nAt the moment we are plotting just the \nexperimental data we want to reproduce")
+print("Simulations coming soon!\n")
 
