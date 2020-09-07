@@ -3,68 +3,70 @@ import xlrd as xl
 from scipy.stats.mstats import gmean
 from scipy.sparse.linalg import eigsh
 
-wb = xl.open_workbook("/nfs/home/icimaf06/3. TCGA-KIRC/sample.xls")
-#ws = wb["gdc_sample_sheet.2019-04-16"]
-ws = wb.sheet_by_index(0)
+def read_data():
+    wb = xl.open_workbook("./../external_database/TCGA/3. TCGA-KIRC/sample.xls")
+    ws = wb.sheet_by_index(0)
 
-directory = '/nfs/home/icimaf06/3. TCGA-KIRC/datos3/'
+    directory = './../external_database/TCGA/3. TCGA-KIRC/'
 
-sample_type = []
-#data = []
-sanos = []
-tumor = []
-datos = []
-#pos_sano = []
-#pos_tumor = []
+    sample_type = []
+    normal = []
+    tumor = []
+    data = []
 
-for i in range(1, ws.nrows):
+    for i in range(1, ws.nrows):
+        
+        nombre = ws.cell_value(i,0)
+        sample_type.append(ws.cell_value(i,3))
+
+        file_object = open(file = directory + nombre, mode = "r")
+        lines = file_object.readlines()
+
+        if(ws.cell_value(i,3) == 'Solid Tissue Normal'):
+            normal.append(i - 1)
+        else:
+            tumor.append(i - 1)
+
+        data.append([])
+        for line in lines:
+            data[-1].append(line.split()[1])
+        
+        file_object.close()
+
+
+    return([np.array(data, dtype='double') + 0.1, normal, tumor])
+
+def calc(data, normal):
+    ref = gmean(data[normal])
+
+    t = np.log2(data/ref)
+
+    covariance = np.dot(t.T, t)/t.shape[0]
+
+    eigenvalues, eigenvectors = eigsh(covariance, k = 100)
+
+    eigenvalues_normalized = eigenvalues/eigenvalues.sum()
+
+    projection = np.dot(eigenvalues.T,t.T)
     
-#    data.append([])
-    nombre = ws.cell_value(i,0)
-    sample_type.append(ws.cell_value(i,3))
+    return([eigenvalues, eigenvectors, vals_normalized, projection])
 
-    file_object = open(file = directory + nombre, mode = "r")
-    lines = file_object.readlines()
+if __name__ == "__main__":
+    data, normal, tumor = read_data()
+    
+    eigenvalues, eigenvectors, eigenvalues_normalized, projection = calc(data, normal)
 
-    if(ws.cell_value(i,3) == 'Solid Tissue Normal'):
-        sanos.append(i - 1)
-    else:
-        tumor.append(i - 1)
+    np.savetxt('./../PCA_tcga/KIRC/PC_dat.dat', projection.T, fmt='%f')
+    np.savetxt('./../PCA_tcga/KIRC/eigenvectors_dat.dat', eigenvectors.T, fmt='%f')
+    np.savetxt('./../PCA_tcga/KIRC/vals_normalized_dat.dat', vals_normalized, fmt='%f')
+    np.savetxt('./../PCA_tcga/KIRC/eigenvalues_dat.dat', eigenvalues, fmt='%f')
+    np.savetxt('./../PCA_tcga/KIRC/eigenvectorsT_dat.dat', eigenvectors, fmt='%f')
 
-    datos.append([])
-    for line in lines:
-        datos[-1].append(line.split()[1])
+    principal = eigenvectors[:, eigenvalues.argmax()]
+    index = np.argpartition(-np.abs(principal), 20)[:20]
+    components = principal[index]
 
-
-datos = np.array(datos, dtype='double') + 0.1
-
-referencia = gmean(datos[sanos])
-
-t = np.log2(datos/referencia)
-#t_reference = np.mean(t, axis=0)
-
-#a = t - t_reference
-
-covariance = np.dot(t.T, t)/t.shape[0]
-
-vals, vect = eigsh(covariance, k = 100)
-
-vals_normalizados = vals/vals.sum()
-
-proyeccion = np.dot(vect.T,t.T)
-
-
-np.savetxt('results2/PC', proyeccion.T, fmt='%f')
-np.savetxt('results2/vec', vect.T, fmt='%f')
-np.savetxt('results2/resultados', vals_normalizados, fmt='%f')
-np.savetxt('results2/autovalores', vals, fmt='%f')
-np.savetxt('results2/vec2', vect, fmt='%f')
-
-principal = vect[:, vals.argmax()]
-indices = np.argpartition(-np.abs(principal), 20)[:20]
-componentes = principal[indices]
-
-np.savetxt('results2/20_indices.txt', indices, fmt='%i')
-np.savetxt('results2/20_componentes.txt', componentes, fmt='%f')
-np.savetxt('results2/sanos.txt', sanos, fmt='%i')
-np.savetxt('results2/tumor.txt', tumor, fmt='%i')
+    np.savetxt('./../PCA_tcga/KIRC/20_index_dat.dat', index, fmt='%i')
+    np.savetxt('./../PCA_tcga/KIRC/20_component_dat.dat', components, fmt='%f')
+    np.savetxt('./../PCA_tcga/KIRC/normal_dat.dat', normal, fmt='%i')
+    np.savetxt('./../PCA_tcga/KIRC/tumor_dat.dat', tumor, fmt='%i')
