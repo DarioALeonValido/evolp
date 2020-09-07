@@ -4,10 +4,10 @@ from scipy.stats.mstats import gmean
 from scipy.sparse.linalg import eigsh
 
 def read_data():
-    wb = xl.open_workbook("./../external_database/TCGA/3. TCGA-KIRC/sample.xls")
+    wb = xl.open_workbook("./../external_database/TCGA/7. TCGA-UCEC/sample.xls")
     ws = wb.sheet_by_index(0)
 
-    directory = './../external_database/TCGA/3. TCGA-KIRC/'
+    directory = './../external_database/TCGA/7. TCGA-UCEC/'
 
     sample_type = []
     normal = []
@@ -56,17 +56,17 @@ if __name__ == "__main__":
     
     eigenvalues, eigenvectors, eigenvalues_normalized, projection = calc(data, normal)
 
-    np.savetxt('./../PCA_tcga/KIRC/PC_dat.dat', projection.T, fmt='%f')
-    np.savetxt('./../PCA_tcga/KIRC/eigenvectors_dat.dat', eigenvectors.T, fmt='%f')
-    np.savetxt('./../PCA_tcga/KIRC/eigenvalues_normalized_dat.dat', eigenvalues_normalized, fmt='%f')
-    np.savetxt('./../PCA_tcga/KIRC/eigenvalues_dat.dat', eigenvalues, fmt='%f')
-    np.savetxt('./../PCA_tcga/KIRC/eigenvectorsT_dat.dat', eigenvectors, fmt='%f')
+    np.savetxt('./../PCA_tcga/UCEC/PC_dat.dat', projection.T, fmt='%f')
+    np.savetxt('./../PCA_tcga/UCEC/eigenvectors_dat.dat', eigenvectors.T, fmt='%f')
+    np.savetxt('./../PCA_tcga/UCEC/eigenvalues_normalized_dat.dat', eigenvalues_normalized, fmt='%f')
+    np.savetxt('./../PCA_tcga/UCEC/eigenvalues_dat.dat', eigenvalues, fmt='%f')
+    np.savetxt('./../PCA_tcga/UCEC/eigenvectorsT_dat.dat', eigenvectors, fmt='%f')
 
     principal = eigenvectors[:, eigenvalues.argmax()]
     index = np.argpartition(-np.abs(principal), 20)[:20]
     components = principal[index]
 
-    np.savetxt('./../PCA_tcga/KIRC/20_index_dat.dat', index, fmt='%i')
-    np.savetxt('./../PCA_tcga/KIRC/20_component_dat.dat', components, fmt='%f')
-    np.savetxt('./../PCA_tcga/KIRC/normal_dat.dat', normal, fmt='%i')
-    np.savetxt('./../PCA_tcga/KIRC/tumor_dat.dat', tumor, fmt='%i')
+    np.savetxt('./../PCA_tcga/UCEC/20_index_dat.dat', index, fmt='%i')
+    np.savetxt('./../PCA_tcga/UCEC/20_component_dat.dat', components, fmt='%f')
+    np.savetxt('./../PCA_tcga/UCEC/normal_dat.dat', normal, fmt='%i')
+    np.savetxt('./../PCA_tcga/UCEC/tumor_dat.dat', tumor, fmt='%i')
