@@ -56,22 +56,6 @@ def read_data(datapath,tissue_id):
     return([np.array(data, dtype='double') + 0.1, normal, tumor]) 
         ## Es realmente necesario usar 'double'? Tampoco se entiende el + 0.1
 
-#def calcc(data, normal):
-#    #ref = gmean(data[normal])  ## esto no me funciono asi
-#    data_n = []
-#    for i in normal:
-#        data_n.append(data[i])
-#    ref = gmean(data_n)#
-#
-#    t = np.log2(data/ref)
-#    covariance = np.dot(t.T, t)/t.shape[0]
-#    #eigenvalues, eigenvectors = eigsh(covariance, k = 100) ## no es necesario para la version lite
-#    eigenvalues, eigenvectors = eigh(covariance)
-#    eigenvalues_normalized = eigenvalues/eigenvalues.sum()
-#    projection = np.dot(eigenvalues.T,t.T)
-#    
-#    return([eigenvalues, eigenvectors, eigenvalues_normalized, projection])
-
 
 # Reading and processing the data ------------------------------------------
 
