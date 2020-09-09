@@ -4,7 +4,7 @@ import PCA_core as pca
 
 # Names ----------------------------------------------------------
 
-datapath="./"
+datapath="../external_databases/TCGA/"
 tissue_id="KIRC"
 #possible targets:
 #tissue_id=["BRCA","COAD","HNSC","KIRC","KIRP","LIHC","LUAD","LUSC",
