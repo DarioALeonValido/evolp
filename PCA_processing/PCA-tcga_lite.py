@@ -11,8 +11,7 @@ lite_version = True
 Ngen = 1000
 tissue_id = "GBM"
 #possible targets:
-#tissue_id=["BRCA","COAD","HNSC","KIRC","KIRP","LIHC","LUAD","LUSC",
-#                  "PRAD","STAD","THCA","UCEC","BLCA","ESCA","READ"]
+#tissue_id=["PRAD", "KIRC", "LUSC", "LUAD", "UCEC", "KIRP", "BLCA", "COAD", "ESCA", "LIHC", "STAD", "THCA", "BRCA", "HNSC", "READ"]
 
 datapath = "../external_databases/TCGA/"
 outputpath = "../PCA_tcga/"
