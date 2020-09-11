@@ -1,14 +1,21 @@
 import numpy as np
 import xlrd as xl
+from scipy.stats.mstats import gmean
+import matplotlib.pyplot as plt
+from pathlib import Path
 import PCA_core as pca
 
 # Names ----------------------------------------------------------
 
-datapath="../external_databases/TCGA/"
-tissue_id="KIRC"
+lite_version = True
+Ngen = 1000
+tissue_id = "GBM"
 #possible targets:
 #tissue_id=["BRCA","COAD","HNSC","KIRC","KIRP","LIHC","LUAD","LUSC",
 #                  "PRAD","STAD","THCA","UCEC","BLCA","ESCA","READ"]
+
+datapath = "../external_databases/TCGA/"
+outputpath = "../PCA_tcga/"
 
 # Functions ------------------------------------------------------
 
@@ -35,11 +42,11 @@ def read_data(datapath,tissue_id):
         tumor.append(0)
     data.append([])
     for line in lines:
-        data[-1].append(line.split()[1])        
+        data[-1].append(line.split()[1])
     file_object.close()
 
     #reading the rest of the files
-    for i in range(2, ws.nrows):        
+    for i in range(2, ws.nrows):
         name = ws.cell_value(i,0)
         sample_type.append(ws.cell_value(i,3))
         file_object = open(datapath+"data"+tissue_id+"/"+name, "r")
@@ -50,11 +57,20 @@ def read_data(datapath,tissue_id):
             tumor.append(i - 1)
         data.append([])
         for line in lines:
-            data[-1].append(line.split()[1])        
+            data[-1].append(line.split()[1])
         file_object.close()
 
-    return([np.array(data, dtype='double') + 0.1, normal, tumor]) 
-        ## Es realmente necesario usar 'double'? Tampoco se entiende el + 0.1
+    data = np.array(data, dtype="f") + 0.1
+    ref = gmean(data[normal])  ## esto no me funciono asi
+    # data_n = []
+    # for i in normal:
+    #     data_n.append(data[i])
+    # ref = gmean(data_n)
+
+    data = np.log2(data/ref)
+
+    return([data, normal, tumor])
+
 
 
 # Reading and processing the data ------------------------------------------
@@ -68,16 +84,22 @@ print("tumor =", len(tumor))
 print("total =", len(data))
 
 # reducing the data by 30 genes for lite version
-print("Lite version: reducing the number of genes by", 30)
-data_red = []
-for i in range(len(data)):
-    data_red.append([])
-    for j in range(30):
-        data_red[i].append(data[i][j])
+if(lite_version and data.shape[1] > Ngen):
+    print("Lite version: reducing the number of genes by", Ngen)
+    data = data[:, :Ngen]
+elif(len(data) < Ngen):
+    lite_version = False
+    print("The number of genes selected for lite version can't be upper that the number of genes in the files")
+    print("Returning to the full version")
+# data_red = []
+# for i in range(len(data)):
+#     data_red.append([])
+#     for j in range(30):
+#         data_red[i].append(data[i][j])
 
 print("Computing PCA components...")
 #eigenvalues, eigenvectors, eigenvalues_normalized, projection = pca.calc(data, normal) #Full version
-eigenvalues, eigenvectors, eigenvalues_normalized, projection = pca.calc(data_red, normal)
+eigenvalues, eigenvectors, eigenvalues_normalized, projection = pca.PC_decomposition(data, normal)
 principal = eigenvectors[:, eigenvalues.argmax()]
 index = np.argpartition(-np.abs(principal), 20)[:20]
 components = principal[index]
@@ -86,15 +108,30 @@ print("Done!")
 
 # Output data and figures --------------------------------------------------
 
-print("Exporting data...")
-np.savetxt('PC_dat.dat', projection.T, fmt='%f')
-np.savetxt('eigenvectors_dat.dat', eigenvectors.T, fmt='%f')
-np.savetxt('eigenvalues_normalized_dat.dat', eigenvalues_normalized, fmt='%f')
-np.savetxt('eigenvalues_dat.dat', eigenvalues, fmt='%f')
-np.savetxt('eigenvectorsT_dat.dat', eigenvectors, fmt='%f')
-np.savetxt('20_index_dat.dat', index, fmt='%i')
-np.savetxt('20_component_dat.dat', components, fmt='%f')
-np.savetxt('normal_dat.dat', normal, fmt='%i')
-np.savetxt('tumor_dat.dat', tumor, fmt='%i')    
-print("Done!")
+plt.grid(True)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
 
+plt.scatter(projection[0,normal], projection[1,normal], c='b', s=15,label="Normal")
+plt.scatter(projection[0,tumor], projection[1,tumor], c='r', s=15,label="Tumor")
+
+plt.legend()
+
+
+print("Exporting data...")
+outputpath = outputpath + tissue_id + '_results/'
+Path(outputpath).mkdir(exist_ok=True)
+np.savetxt(outputpath + 'PC_dat.dat', projection, fmt='%f')
+np.savetxt(outputpath + 'eigenvectors_dat.dat', eigenvectors.T, fmt='%f')
+np.savetxt(outputpath + 'eigenvalues_normalized_dat.dat', eigenvalues_normalized, fmt='%f')
+np.savetxt(outputpath + 'eigenvalues_dat.dat', eigenvalues, fmt='%f')
+np.savetxt(outputpath + 'eigenvectorsT_dat.dat', eigenvectors, fmt='%f')
+np.savetxt(outputpath + '20_index_dat.dat', index, fmt='%i')
+np.savetxt(outputpath + '20_component_dat.dat', components, fmt='%f')
+np.savetxt(outputpath + 'normal_dat.dat', normal, fmt='%i')
+np.savetxt(outputpath + 'tumor_dat.dat', tumor, fmt='%i')
+
+plt.savefig(outputpath + tissue_id + '_PC2_Vs_PC1_fig.png')
+plt.show()
+
+print("Done!")
