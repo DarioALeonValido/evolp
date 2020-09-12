@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
-style.use('bmh')
+style.use('default')
           
 #Impot data for ploteable tissues
 x1, Rn, Rt, D, Nsc, msc, risk = np.loadtxt('tissues_data.txt', delimiter=',', unpack=True)
