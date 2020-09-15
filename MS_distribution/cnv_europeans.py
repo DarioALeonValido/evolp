@@ -5,8 +5,8 @@ of over 100,000 European ancestry subjects.
 The output figure is similar to the one in paper
 arXiv:1605.09697
 
-For more details see author(s):
-DALV, AG
+For more details on this file see author(s):
+DALV
 """
 
 import numpy as np
@@ -16,8 +16,8 @@ from pylab import *
 
 # Names ----------------------------------------------------------
 
-datapath="../external_databases/CNV/" 
-file_cnv = "CNV.bed"
+datapath="../databases_external/CNV/" 
+file_cnv = "eur_CNV.bed"
 
 
 # Functions ------------------------------------------------------

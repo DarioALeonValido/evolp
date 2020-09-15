@@ -13,6 +13,8 @@ Brief Introduction to the Repository ...
 GE   : Gene Expression
 LTEE : Long Term Evolution Experiment
 MS   : Mutation Space
+CLR  : Cancer Lifetime Risk
+ERS  : Extra Risk Score
 PCA  : Principal Component Analysis
 TCGA : The Cancer Genome Atlas 
 BRCA : ...

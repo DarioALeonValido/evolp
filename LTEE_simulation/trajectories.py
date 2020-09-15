@@ -7,8 +7,8 @@ refered to fitness and mutation data of the LTEE.
 Simulations of the experimental data will be release
 in further versions.
 
-For more details see author(s):
-DALV, AG
+For more details on this file see author(s):
+DALV
 """
 
 import numpy as np
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 # Names ----------------------------------------------------------
 
-datapath="../external_databases/LTEE/trajectories/" 
+datapath="../databases_external/LTEE/trajectories/" 
 file_Ws = "Ws.dat"
 file_Ms = "Ms.dat"
 

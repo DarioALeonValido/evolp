@@ -15,6 +15,7 @@
 *.dep
 *.f90
 *pyc
+___pycache__
 
 # source #
 ##########

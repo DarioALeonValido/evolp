@@ -4,8 +4,8 @@ This script file processes mutation data from the LTEE.
 The output figures are versions of the ones in paper
 arXiv:1605.09697
 
-For more details see author(s):
-DALV, AG
+For more details on this file see author(s):
+DALV
 """
 
 import numpy as np
@@ -16,7 +16,7 @@ from pylab import *
 
 # Names ----------------------------------------------------------
 
-datapath="../external_databases/LTEE/mutations/" 
+datapath="../databases_external/LTEE/mutations/" 
 file_A1_mutF = "Ara-1_mut-SP_fixed.dat"
 file_A1_SNP = "Ara-1_mut-SNP.dat"
 file_A1_LR = "Ara-1_mut-LR.dat"
