@@ -1,66 +1,94 @@
+"""
+This script file processes data on cancer risk for a set
+of tissues. A reference lower limit value is estimated
+and the Extra Risk Score is calculated for all tissues.
+The procedure and main results are described in paper 
+arxiv:1507.08232v4
+
+For more details on this file see author(s):
+RHP, DALV
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import style
-style.use('default')
 
-file_name = '../databases_external/CLR/cancer-risk.dat'
+# Names ----------------------------------------------------------
 
-#Data import
+CLR_path = '../databases_external/CLR/'
+CLR_file = 'cancer-risk.dat'
 
-def read_data(file_name):
+
+# Functions ------------------------------------------------------
+
+def read_CLRdata(file_name):
     file = open(file_name, 'r')
     lines = file.readlines()
-    
-    names = []
-    data = []
+
+    name = []    
+    risk = []
+    Nsc = []
+    msc = []
     for line in lines[13:]:
-        names.append(line.split()[0])
-        data.append(line.split()[-6:])    
-    data = np.array(data, dtype=np.float)
+        name.append(line.split()[0])
+        risk.append(line.split()[-6])
+        Nsc.append(line.split()[-4])
+        msc.append(line.split()[-3])
+    risk = np.array(risk, np.float)
+    Nsc = np.array(Nsc, np.float)
+    msc = np.array(msc, np.float)
+
   
-    return(data,names)
+    return(name,risk,Nsc,msc)
 
-if __name__ == "__main__":
-    data, names = read_data(file_name)
-    risk = data[:,0]
-    Nsc = data[:,2]
-    msc = data[:,3]
-    t0 = np.log2(Nsc)
-    t = msc*80
+
+# Reading and processing the data ------------------------------------------
+
+name,risk,Nsc,msc = read_CLRdata(CLR_path+CLR_file)
+t0 = np.log2(Nsc)
+t = t0 + msc*80 #total number of stem cell divisions
+risk = risk/Nsc #risk per stem cell
+
+aref = 2e-14             #reference value
+ERS = risk/(aref*(t0+t)) #extra risk score
     
-#Calculate y for plot
-    y = np.log10(risk/Nsc)
 
-#Calculate x for plot
-    x = np.log10(t0 + t)    
+# Plots ---------------------------------------------------------------
 
+r11 = 1e-12
+r21 = 2e-13
+r12 = 1e-9
+r22 = 2e-10
+x1 = 1e1
+x2 = 1e4
 
-#Plot
-m = 1
-b1 = -13
-b2 = -13.7
-x1 = (1.25,4)
-x1 = np.array(x1)
-plt.scatter(x,y)
-plt.plot(x1, x1*m + b1,color='r',linestyle = 'dashed')
-plt.plot(x1, x1*m + b2,color='r',linestyle = 'dashed')
-plt.xlabel('log(t0+msc80yrs)')
-plt.ylabel('log(Lifetime risk/Nsc)')
+plt.loglog([x1, x2],[r11, r12],color='r',linestyle = 'dashed')
+plt.loglog([x1, x2],[r21, r22],color='r',linestyle = 'dashed')
+
+plt.loglog(t,risk,linestyle='none',marker='o')
+for i in range(len(t)):
+    plt.annotate(name[i], (t[i], risk[i]))
+
+plt.xlabel('t0+msc*80yrs')
+plt.ylabel('Lifetime risk/Nsc')
 plt.tight_layout()
-#plt.show()
 plt.savefig('lifetimerisk_fig.pdf')
    
-#Calculate ERS
-aref = 2e-14
-ERS = risk/(Nsc*aref*(t0+t))
-print('ERS: \n', ERS)    
 
-#Save data
-D = len(names)
-Iter = range(D)
-savefile = open('ERS_dat.dat','w+')
-savefile.write('In this file are listed the values of ERS for each tissue \n \n')
-savefile.write('Tissue\tERS\n')
-for x in zip(names,ERS):
-    savefile.write(" {0}\t{1}\n".format(*x))
-savefile.close()
+# Exporting readable data ------------------------------------------------------
+
+sl = max(np.char.str_len(name)) #maximum number of characters of name
+
+with open('ERS_dat.dat','w+') as savefile:
+    savefile.write('In this file are listed the values of ERS for each tissue.\n\n')
+    savefile.write('#Tissue')
+    for i in range(sl-6):
+        savefile.write(' ')
+    savefile.write('\tERS\n')
+    for i in range(len(name)):
+        savefile.write(" %s" %name[i])
+        for k in range(sl-len(name[i])):
+            savefile.write(' ')
+        savefile.write("\t%f\n" %ERS[i])
+    savefile.write('\n')
+    savefile.close()
+

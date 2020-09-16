@@ -15,7 +15,6 @@ import xlrd as xl
 from scipy.stats.mstats import gmean
 import matplotlib.pyplot as plt
 from pathlib import Path
-import shutil
 import PCA_core as pca
 
 
