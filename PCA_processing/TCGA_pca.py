@@ -131,6 +131,7 @@ if(lite_version):
     plt.xlabel('PC1')
     plt.ylabel('-PC2')
     plt.legend()
+    plt.tight_layout()
     plt.savefig(tissue_id+'_PC2_Vs_PC1_fig.png')
 else:
     np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection, fmt='%f')
