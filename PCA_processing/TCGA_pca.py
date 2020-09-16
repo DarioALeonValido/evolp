@@ -22,6 +22,7 @@ import PCA_core as pca
 
 lite_version = True
 Ngen = 1000
+Npc = 20 #the maximum possible number of PCs is the number of genes
 tissue_id = "KIRC"
 #possible targets:
 #tissue_id=["PRAD", "KIRC", "LUSC", "LUAD", "UCEC", "KIRP", "BLCA", "COAD", 
@@ -66,9 +67,9 @@ def read_data(datapath,tissue_id):
         file_object = open(datapath+"data"+tissue_id+"/"+name, "r")
         lines = file_object.readlines()
         if(ws.cell_value(i,3) == 'Solid Tissue Normal'):
-            normal.append(i - 1)
+            normal.append(i-1)
         else:
-            tumor.append(i - 1)
+            tumor.append(i-1)
         data.append([])
         for line in lines:
             data[-1].append(line.split()[1])
@@ -106,7 +107,7 @@ else:
     eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data,normal,True)
 
 principal = eigenvectors[:, eigenvalues.argmax()]
-index = np.argpartition(-np.abs(principal), 20)[:20]
+index = np.argpartition(-np.abs(principal), Npc)[:Npc]
 components = principal[index]
 print("Done!")
 
