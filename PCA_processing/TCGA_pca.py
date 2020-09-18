@@ -14,11 +14,12 @@ import numpy as np
 import xlrd as xl
 from scipy.stats.mstats import gmean
 import matplotlib.pyplot as plt
-from pathlib import Path
+import sys
 import PCA_core as pca
+from os.path import *
 
 
-# Names ----------------------------------------------------------
+# General variables ------------------------------------------------------
 
 lite_version = True
 Ngen = 1000
@@ -47,6 +48,9 @@ def read_data(datapath,tissue_id):
     #reading first file to evaluate the cost
     name = ws.cell_value(1,0)
     sample_type.append(ws.cell_value(1,3))
+    if(not isfile(datapath+"data"+tissue_id+"/"+name)):
+        print(tissue_id, "databases not found, please read", "'"+ datapath + "info.txt'")
+        sys.exit()
     file_object = open(datapath+"data"+tissue_id+"/"+name, "r")
     lines = file_object.readlines()
     print("Each file contains",len(lines),"genes.")
@@ -85,6 +89,9 @@ def read_data(datapath,tissue_id):
 # Reading and processing the data ------------------------------------------
 
 print("Reading files from databases:")
+if(not isfile(datapath+"sample"+tissue_id+".xls")):
+    print(tissue_id, "databases not found, please read", "'"+ datapath + "info.txt'")
+    sys.exit()
 data, normal, tumor = read_data(datapath,tissue_id)
 print("Data successfully loaded!")
 print("normal =", len(normal))

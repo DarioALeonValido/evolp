@@ -12,7 +12,7 @@ RHP, DALV
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Names ----------------------------------------------------------
+# General variables -----------------------------------------------
 
 CLR_path = '../databases_external/CLR/'
 CLR_file = 'cancer-risk.dat'

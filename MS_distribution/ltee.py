@@ -14,7 +14,7 @@ from scipy.optimize import curve_fit
 from pylab import *
 
 
-# Names ----------------------------------------------------------
+# General variables -----------------------------------------------
 
 datapath="../databases_external/LTEE/mutations/" 
 file_A1_mutF = "Ara-1_mut-SP_fixed.dat"
