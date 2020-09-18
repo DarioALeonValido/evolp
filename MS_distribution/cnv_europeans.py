@@ -11,6 +11,8 @@ DALV
 
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+from os.path import *
 from pylab import *
 
 
@@ -54,11 +56,14 @@ def Difference_Dist(x0,xf):
 # Manipulating the data -----------------------------------------------
 
 print("Processing CNV data of over 100,000 European ancestry subjects ...")
+if(not isfile(datapath+file_cnv)):
+    print("CNV databases not found, please read", "'"+ datapath + "info.txt'")
+    sys.exit()
+
 start_hg18, end_hg18 = Read_Two_Column_From_File(datapath+file_cnv,1,2,3)
 print(len(start_hg18),"values were loaded!")
 print("10 secs more to compute and produce the plot")
 cnv_size, cnv_cprob = Difference_Dist(start_hg18,end_hg18)
-
 
 # Plots ---------------------------------------------------------------
 
@@ -81,3 +86,4 @@ plt.savefig('eur_CNV_distribution_fig.png')
 #plt.show()
 
 print("Job Done!") 
+
