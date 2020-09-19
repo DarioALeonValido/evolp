@@ -1,8 +1,9 @@
 """
 This script file processes data on cancer risk and the
 results of the PCA technique applied to TCGA data of a 
-set of tissues. The procedures and main results are 
-described in paper arxiv:1507.08232v4
+set of tissues. The data surces are mentioned in the 
+imported files, while the procedures and main results 
+are described in paper arxiv:1507.08232v4
 
 For more details on this file see author(s):
 RHP, DALV
@@ -16,8 +17,8 @@ import matplotlib.pyplot as plt
 
 Npc = 2
 tissue_id = 'COAD'
-tissues_PCA = ['BRCA','COAD','HNSC','LIHC','LUAD','PRAD','THCA','ESCA']
-tissues_CLR = ['Breast','Colorectal','Head_Neck','Hepatocellular','Lung','Prostate','Thyroid_Papillary','Esophageal']
+tissues_PCA = ['BRCA','COAD','ESCA','HNSC','LIHC','LUAD','PRAD','THCA']
+tissues_CLR = ['Breast','Colorectal','Esophageal','Head_Neck','Hepatocellular','Lung','Prostate','Thyroid_Papillary']
 
 sample_path = '../databases_external/TCGA/'
 PC_path = '../databases_generated/TCGA_pca/'
@@ -92,7 +93,7 @@ def compute_GEdistances(sample_path,PC_path,tissues):
 
 # Reading and processing all the data ---------------------------------------
 
-name,risk,Nsc,msc = read_CLRdata(CLR_path+CLR_file)
+nameCLR,risk,Nsc,msc = read_CLRdata(CLR_path+CLR_file)
 t0 = np.log2(Nsc)
 t = t0 + msc*80 #total number of stem cell divisions
 risk = risk/Nsc #risk per stem cell
@@ -107,7 +108,7 @@ Xt,Rn,Rt = compute_GEdistances(sample_path,PC_path,tissues_PCA)
 
 # Exporting readable data ------------------------------------------------------
 
-sl = max(np.char.str_len(name)) #maximum number of characters of name
+sl = max(np.char.str_len(nameCLR)) #maximum number of characters of nameCLR
 
 with open('ERS_dat.dat','w+') as savefile:
     savefile.write('In this file are listed the values of ERS for each tissue.\n\n')
@@ -115,9 +116,9 @@ with open('ERS_dat.dat','w+') as savefile:
     for i in range(sl-6):
         savefile.write(' ')
     savefile.write('\tERS\n')
-    for i in range(len(name)):
-        savefile.write(" %s" %name[i])
-        for k in range(sl-len(name[i])):
+    for i in range(len(nameCLR)):
+        savefile.write(" %s" %nameCLR[i])
+        for k in range(sl-len(nameCLR[i])):
             savefile.write(' ')
         savefile.write("\t%f\n" %ERS[i])
     savefile.write('\n')
@@ -149,7 +150,7 @@ plt.loglog([x1, x2],[r21, r22],color='r',linestyle = 'dashed')
 
 plt.loglog(t,risk,linestyle='none',marker='o')
 for i in range(len(t)):
-    plt.annotate(name[i], (t[i], risk[i]))
+    plt.annotate(nameCLR[i], (t[i], risk[i]))
 
 plt.xlabel('t0+msc*80yrs')
 plt.ylabel('Lifetime risk/Nsc')
@@ -162,6 +163,8 @@ plt.scatter(-pc_data[ind_normal,0],pc_data[ind_normal,1],label='normal')
 plt.scatter(-pc_data[ind_tumor,0],pc_data[ind_tumor,1],label='tumor')
 plt.xlabel('PC1')
 plt.ylabel('PC2')
+plt.title(tissue_id)
+plt.legend()
 plt.tight_layout()
 plt.savefig('ge'+tissue_id+'_fig.pdf')
 plt.clf() # clear the plot
@@ -173,13 +176,13 @@ D = np.array(D, dtype="f")
 
 indexes= []
 for t_clr in tissues_CLR:
-    ind = np.where(name == t_clr)
+    ind = np.where(nameCLR == t_clr)
     indexes.append(ind[0][0])
 
 log_risk = np.log(risk[indexes])
 
 #Calculate x for Brownian oscilations plot
-x_b = np.array(-2*(D*t[indexes]/Rn)**(-2) + np.log(D*t[indexes]/Rn), dtype="f")  
+x_b = np.array(-2*(D*t[indexes]/Rn)**-2 + np.log(D*t[indexes]/Rn), dtype="f")  
 
 #Calculate x for large Levy jumps
 x_l = np.array(np.log(D*t[indexes]/Rn), dtype="f")  
@@ -194,7 +197,6 @@ p2 = plt.plot([np.min(x_b),np.max(x_b)], [m*np.min(x_b),m*np.max(x_b)]+b,
 color='r', 
 label = 'Linear fit',
 linestyle='dashed')
-print('Slope for brownian oscilations m =',+m)
 
 #Set plot parameters
 plt.xlabel('-2Dt/Rn^-2 + ln(Dt/Rn)')
@@ -212,7 +214,6 @@ plt.scatter(x_l, log_risk, label = 'Data')
 #Linear fit for large Levy jumps
 m = 1
 n = np.mean(log_risk - m*x_l)
-print('n=',n)
 p2 =plt.plot([np.min(x_l),np.max(x_l)], m*[np.min(x_l),np.max(x_l)]+n,
 color='r',
 label ='-22.91+x',
