@@ -11,6 +11,7 @@ RHP, DALV
 
 import numpy as np
 import xlrd as xl
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # General variables -----------------------------------------------
@@ -72,6 +73,16 @@ def read_PCdata(sample_path,PC_path,tissue_id,Npc):
     return pc_data, ind_normal, ind_tumor
 
 
+def fitness_dist(pc1,ind_n,ind_t,fitN,fitT,binsN,binsT):
+
+    histN,bin_edgesN = np.histogram(pc1[ind_n],bins=binsN)
+    histT,bin_edgesT = np.histogram(pc1[ind_t],bins=binsT)
+    pc = np.concatenate((bin_edgesN[0:-1],bin_edgesT[0:-1]), axis=None)
+    mfitness = np.concatenate((-fitN*histN/max(histN),-fitT*histT/max(histT)))
+
+    return pc,mfitness
+
+
 def compute_GEdistances(sample_path,PC_path,tissues):
     Xt = []
     Rn = []
@@ -82,8 +93,7 @@ def compute_GEdistances(sample_path,PC_path,tissues):
         Xn = np.mean(pc_data[ind_normal])
         Rn.append(np.std(pc_data[ind_normal]))
         Xt.append(np.mean(pc_data[ind_tumor]) - Xn)
-        Rt.append(np.std(pc_data[ind_tumor]- Xn))
-  
+        Rt.append(np.std(pc_data[ind_tumor]- Xn))  
     Xt = np.array(Xt, dtype="f")      
     Rn = np.array(Rn, dtype="f")   
     Rt = np.array(Rt, dtype="f")   
@@ -103,6 +113,7 @@ ERS = risk/(aref*(t0+t)) #extra risk score
 
 #working with PCA data
 pc_data,ind_normal,ind_tumor = read_PCdata(sample_path,PC_path,tissue_id,Npc)
+pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
 Xt,Rn,Rt = compute_GEdistances(sample_path,PC_path,tissues_PCA)
 
 
@@ -138,6 +149,7 @@ with open('GE_dat.dat','w+') as savefile:
 
 # Plots ---------------------------------------------------------------
 
+# plotting time vs. risk ----------------------------
 r11 = 1e-12
 r21 = 2e-13
 r12 = 1e-9
@@ -157,20 +169,30 @@ plt.ylabel('Lifetime risk/Nsc')
 plt.tight_layout()
 plt.savefig('lifetime-risk_fig.pdf')
 plt.clf() # clear the plot
-   
 
-plt.scatter(-pc_data[ind_normal,0],pc_data[ind_normal,1],label='normal')
-plt.scatter(-pc_data[ind_tumor,0],pc_data[ind_tumor,1],label='tumor')
+   
+# plotting PC1 vs. PC2 ----------------------------
+plt.scatter(-pc_data[ind_normal,0],pc_data[ind_normal,1],label='normal',c='b',s=15)
+plt.scatter(-pc_data[ind_tumor,0],pc_data[ind_tumor,1],label='tumor',c='r',s=15)
 plt.xlabel('PC1')
 plt.ylabel('PC2')
 plt.title(tissue_id)
 plt.legend()
 plt.tight_layout()
-plt.savefig('ge'+tissue_id+'_fig.pdf')
+plt.grid(True)
+plt.savefig('ge'+tissue_id+'_pc1-2_fig.pdf')
 plt.clf() # clear the plot
 
+plt.plot(pc,mfitness,label='fitness',c='black')
+plt.xlabel('PC1')
+plt.ylabel('-fitness')
+plt.title(tissue_id)
+plt.legend()
+plt.tight_layout()
+plt.savefig('ge'+tissue_id+'_fitness_fig.pdf')
+plt.clf() # clear the plot
 
-#Import data for ploteable tissues
+# plotting Brownian and Levy Correlation ----------------------------
 D = np.loadtxt('tissues_data.txt')
 D = np.array(D, dtype="f")   
 
