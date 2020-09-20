@@ -32,7 +32,7 @@ def read_data(srcpc,srcsampl):
         if (name not in missmatch_pc_samples):
             data[name]={}
             data[name]['normal'], data[name]['tumor']=[],[]
-            wbpc,wbsampl  = xl.open_workbook(srcpc+"pc"+name+".xls"),xl.open_workbook(srcsampl+"sample"+name+".xls")
+            wbpc,wbsampl = xl.open_workbook(srcpc+"pc"+name+".xls"),xl.open_workbook(srcsampl+"sample"+name+".xls")
             wspc,wssampl = wbpc.sheet_by_index(0),wbsampl.sheet_by_index(0)
             minrows=min(wssampl.nrows,wspc.nrows)
             #"PCPG" gives a mistmach of 80 rows! So for now should be avoided.
@@ -88,6 +88,7 @@ def _PC_pair_plot(core_matrix, i, j,location_name):
     plt.ylabel("pc_{0}".format(j))
     plt.title("pc_map_{0}".format(location_name))
     pylab.legend(loc='lower left')
+    plt.tight_layout()
     plt.savefig('pairplot_fig.pdf')   
     return None
 
