@@ -44,6 +44,7 @@ def read_data(datapath,tissue_id):
     normal = []
     tumor = []
     data = []
+    genes_id = []
 
     #reading first file to evaluate the cost
     name = ws.cell_value(1,0)
@@ -62,6 +63,7 @@ def read_data(datapath,tissue_id):
     data.append([])
     for line in lines:
         data[-1].append(line.split()[1])
+        genes_id.append(line.split()[0].split(sep=".")[0])
     file_object.close()
 
     #reading the rest of the files
@@ -83,7 +85,7 @@ def read_data(datapath,tissue_id):
     ref = gmean(data[normal])
     data = np.log2(data/ref)
 
-    return([data, normal, tumor])
+    return([data, normal, tumor, np.array(genes_id)])
 
 
 # Reading and processing the data ------------------------------------------
@@ -92,7 +94,7 @@ print("Reading files from databases:")
 if(not isfile(datapath+"sample"+tissue_id+".xls")):
     print(tissue_id, "databases not found, please read", "'"+ datapath + "info.txt'")
     sys.exit()
-data, normal, tumor = read_data(datapath,tissue_id)
+data, normal, tumor, genes_id = read_data(datapath,tissue_id)
 print("Data successfully loaded!")
 print("normal =", len(normal))
 print("tumor =", len(tumor))
@@ -102,6 +104,7 @@ print("total =", len(data))
 if(lite_version and data.shape[1] > Ngen):
     print("Lite version: reducing the number of genes by", Ngen)
     data = data[:, :Ngen]
+    genes_id = genes_id[:Ngen]
 elif(len(data) < Ngen):
     lite_version = False
     print("Warning: Imposible reduction, number of genes larger than databases.")
@@ -113,9 +116,8 @@ if(lite_version):
 else:
     eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data,normal,True)
 
-principal = eigenvectors[:, eigenvalues.argmax()]
-index = np.argpartition(-np.abs(principal), Npc)[:Npc]
-components = principal[index]
+index = np.argpartition(-np.abs(eigenvectors[:, 0]), Npc)[:Npc]
+components = eigenvectors[index, 0]
 print("Done!")
 
 
@@ -130,17 +132,38 @@ if(lite_version):
     np.savetxt('evec-t'+tissue_id+'_dat.dat', eigenvectors, fmt='%f')
     np.savetxt('ind20'+tissue_id+'_dat.dat', index, fmt='%i')
     np.savetxt('pc20'+tissue_id+'_dat.dat', components, fmt='%f')
+    np.savetxt('ngenes_dat.dat', np.transpose([index, genes_id[index], components]), delimiter="\t", fmt="%s")
     np.savetxt('ind-normal'+tissue_id+'_dat.dat', normal, fmt='%i')
     np.savetxt('ind-tumor'+tissue_id+'_dat.dat', tumor, fmt='%i')
 
-    plt.scatter(projection[0,normal], -projection[1,normal], c='b', s=15,label="Normal")
-    plt.scatter(projection[0,tumor], -projection[1,tumor], c='r', s=15,label="Tumor")
-    plt.grid(True)
-    plt.xlabel('PC1')
-    plt.ylabel('-PC2')
-    plt.legend()
+    radio_pc1_normal, center_pc1_normal = pca.region(projection[0,normal])
+    radio_pc1_tumor, center_pc1_tumor = pca.region(projection[0,tumor])
+    radio_pc2_normal, center_pc2_normal = pca.region(projection[1,normal])
+    radio_pc2_tumor, center_pc2_tumor = pca.region(projection[1,tumor])
+    theta = np.linspace(0, 2*np.pi, 100)
+
+    fig1, ax1 = plt.subplots()
+    fig2, ax2 = plt.subplots()
+    
+    ax1.scatter(projection[0,normal], -projection[1,normal], c='b', s=15,label="Normal")
+    ax1.scatter(projection[0,tumor], -projection[1,tumor], c='r', s=15,label="Tumor")
+    ax1.plot(center_pc1_normal + radio_pc1_normal*np.cos(theta), center_pc2_normal + radio_pc2_normal*np.sin(theta), alpha=0.7)
+    ax1.plot(center_pc1_tumor + radio_pc1_tumor*np.cos(theta), center_pc2_tumor + radio_pc2_tumor*np.sin(theta), alpha=0.7)
+    
+    ax1.grid()
+    ax1.set_xlabel('PC1')
+    ax1.set_ylabel('-PC2')
+    ax1.legend()
+    
+    for i in index:
+        ax2.plot([i,i],[0, eigenvectors[i,0]], color='k')
+    
+    ax2.grid()
+    
     plt.tight_layout()
-    plt.savefig(tissue_id+'_PC2_Vs_PC1_fig.png')
+    
+    fig1.savefig(tissue_id+'_PC2_Vs_PC1_fig.png')
+    fig2.savefig(tissue_id + "_PC1_fig.png")
 else:
     np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection, fmt='%f')
 
