@@ -35,6 +35,11 @@ def PC_decomp_mem(data, normal, sparse_data, max_size):
     #return([eigenvalues, eigenvectors, eigenvalues_normalized, projection])
     return 0
 
+def region(data):
+    center = data.sum()/np.alen(data)
+    radio = np.sqrt(((data - center)**2).sum()/np.alen(data))
+    
+    return([radio, center])
 
 # ------------------------------------------
 
