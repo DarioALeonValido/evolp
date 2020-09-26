@@ -3,6 +3,10 @@
 *_fig.*
 *_dat.*
 
+# uncompressed data #
+###################
+*.FPKM.txt
+*bed
  
 # Compiled source #
 ###################
