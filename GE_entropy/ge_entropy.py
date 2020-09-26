@@ -2,7 +2,6 @@
 This script file computes the entropy and overlap of PCA. 
 The procedure and main results are described in paper 
 arXiv:2005.02271
-A more general analysis can be found in paper ??
 For more details on this file see author(s):
 FEQ
 """
@@ -64,7 +63,6 @@ def _low_dimension_core_matrix(core_matrix, LOW_DIMENSION):
         return unif_restricted_core_matrix
 
 def _PC_pair_plot(core_matrix, i, j,location_name):
-    #location_name = 'LUSC' # 'LUSC' shows a well defined separation between 'normal' and 'tumor'
     PC_j={}
     PC_i={}
     names = []
@@ -80,10 +78,6 @@ def _PC_pair_plot(core_matrix, i, j,location_name):
     ax.scatter(PC_i[location_name]['normal'], PC_j[location_name]['normal'], label='normal')
     ax.scatter(PC_i[location_name]['tumor'],PC_j[location_name]['tumor'], label='tumor')
     
-    #for i, txt in enumerate(names):
-        #ax.annotate(txt, (PC_i[location_name]['normal'][i], PC_j[location_name]['normal'][i]))
-        #ax.annotate(txt, (PC_i[location_name]['tumor'][i], PC_j[location_name]['tumor'][i]))
-        
     plt.xlabel("pc_{0}".format(i))
     plt.ylabel("pc_{0}".format(j))
     plt.title("pc_map_{0}".format(location_name))
@@ -118,7 +112,7 @@ def _covariance_matrix_(core_matrix):
         covariance_matrix[label]={}
         for stage in core_matrix[label].keys():
             covariance_matrix[label][stage]=\
-            np.cov(core_matrix[label][stage], ddof=1 )#np.around(, decimals = 10)
+            np.cov(core_matrix[label][stage], ddof=1 )
     
     return covariance_matrix
 
@@ -181,7 +175,6 @@ def _overlap(mean, covariance_matrix, DIMENSION):
         
         
         overlap[label]= math.pow(2,A)*math.pow(2*math.pi,B)*math.exp(arg)*math.pow(det_inv_Vc,-0.25)
-        #log_overlap[label]=-math.log(overlap[label])
         log_overlap[label]=-A*math.log(2)-B*math.log(2*math.pi)-arg +0.25*math.log(det_inv_Vc)
     return overlap, log_overlap
 
@@ -223,7 +216,6 @@ def _complexity_map(mean, covariance_matrix ,DIMENSION, EXCLUSION_LIST):
     
     
     plt.plot(ident,fitted_y,'b--',label=r"$m \approx {0},n \approx {1}$".format(np.around(fit[0], 2),np.around(fit[1], 2)),linewidth=1)
-    #plt.plot(ident,ident,'k--',label=r'$\alpha =1,\beta =0$',linewidth=1)
     plt.xlabel(r"$\Delta S, S$ (nats)")
     plt.ylim(0, 100)
     plt.ylabel(r"$-\ln \,I$")
@@ -238,22 +230,15 @@ if __name__ == "__main__":
     data, missmatch_pc_samples=read_data(srcpc,srcsampl)
     core_matrix = _transpose_data(data)
 
-    std = _std_dict(core_matrix)
-    mean = _mean_dict(core_matrix)
-    covariance_matrix = _covariance_matrix_(core_matrix)
+    EXCLUSION_LIST =['PCPG','READ','ESCA','CESC', 'ADREN', 'GBM', 'PAAD', 'BLCA']# BECAUSE FEW 'normal' SAMPLES, OTHERWISE EMPTY. 
+    EXCLUSION_LIST.append('PCPG') # EXCLUDED BECAUSE ROWS MISSMATCH BETWEEN SAMPLES AND PC
 
-    EXCLUSION_LIST =['READ','ESCA','CESC', 'Adren', 'GBM', 'PAAD', 'BLCA']# BECAUSE FEW 'normal' SAMPLES, OTHERWISE EMPTY.
+    _PC_pair_plot(core_matrix, 1, 2,'LUSC') 
 
     low_DIMENSION_core_matrix=_low_dimension_core_matrix(core_matrix, LOW_DIMENSION=20)
     low_DIMENSION_covariance_matrix = _covariance_matrix_(low_DIMENSION_core_matrix)
     low_DIMENSION_mean = _mean_dict(low_DIMENSION_core_matrix)
     low_DIMENSION_std = _std_dict(low_DIMENSION_core_matrix)
 
-    linear_fit =_complexity_map(low_DIMENSION_mean,  low_DIMENSION_covariance_matrix ,20, EXCLUSION_LIST)#Polynomial coefficients, highest power first
+    linear_fit =_complexity_map(low_DIMENSION_mean,  low_DIMENSION_covariance_matrix ,20, EXCLUSION_LIST)
 
-    overlap, log_overlap = _overlap(mean, covariance_matrix, 20)
-    
-    entropy_dict = _H_multiv_gaussian(covariance_matrix,DIMENSION=20)
-    
-    delta_H = _delta_H(entropy_dict)
-    _PC_pair_plot(core_matrix, 1, 2,'LUSC') 
