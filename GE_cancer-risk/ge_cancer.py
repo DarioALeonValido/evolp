@@ -14,22 +14,39 @@ import xlrd as xl
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+
 # General variables -----------------------------------------------
 
 Npc = 2
+lifetime=85
 tissue_id = 'COAD'
 tissues_PCA = ['BRCA','COAD','ESCA','HNSC','LIHC','LUAD','PRAD','THCA']
-tissues_CLR = ['Breast','Colorectal','Esophageal','Head_Neck','Hepatocellular','Lung','Prostate','Thyroid_Papillary']
+tissues_CLRm = ['Breast','Colorectal','Esophageal','Head_Neck','Hepatocellular','Lung','Prostate','Thyroid_Papillary']
+tissues_CLRr = ['breast','colorectal','esophageal','head & neck','hepatocellular','lung','prostate','thyroid follicular']
 
 sample_path = '../databases_external/TCGA/'
 PC_path = '../databases_generated/TCGA_pca/'
 CLR_path = '../databases_external/CLR/'
-CLR_file = 'cancer-risk.dat'
+CLRm_file = '1260825_Table1.dat'
+CLRr_file = 'aaf9011_Table_y'+str(lifetime)+'.xlsx'
+D_file = 'tissues_D-data.txt'
 
 
 # Functions ------------------------------------------------------
 
-def read_CLRdata(file_name):
+def read_D(file_name):
+    file = open(file_name, 'r')
+    lines = file.readlines()
+
+    D = []    
+    for line in lines[1:]:
+        D.append(line.split()[-1])
+    D = np.array(D, np.float)
+  
+    return(D)
+
+
+def read_CLRm(file_name):
     file = open(file_name, 'r')
     lines = file.readlines()
 
@@ -37,7 +54,7 @@ def read_CLRdata(file_name):
     risk = []
     Nsc = []
     msc = []
-    for line in lines[13:]:
+    for line in lines[16:]:
         name.append(line.split()[0])
         risk.append(line.split()[-6])
         Nsc.append(line.split()[-4])
@@ -46,11 +63,29 @@ def read_CLRdata(file_name):
     risk = np.array(risk, np.float)
     Nsc = np.array(Nsc, np.float)
     msc = np.array(msc, np.float)
+    print(msc)
+    print(Nsc)
   
     return(name,risk,Nsc,msc)
 
+def read_CLRr(wb_name):
+    name = []    
+    risk = []
+    error = []
+    clr_wb = xl.open_workbook(wb_name)
+    clr_ws = clr_wb.sheet_by_index(0)
+    for i in range(2,clr_ws.ncols-5):
+        name.append(clr_ws.cell_value(0,i))
+        print(clr_ws.cell_value(0,i))
+        risk.append(clr_ws.cell_value(-2,i))
+        error.append(clr_ws.cell_value(-1,i))
+    name = np.array(name)
+    risk = np.array(risk, np.float)
+    error = np.array(risk, np.float)
+  
+    return(name,risk,error)
           
-def read_PCdata(sample_path,PC_path,tissue_id,Npc):
+def read_PC(sample_path,PC_path,tissue_id,Npc):
     ind_normal = []
     ind_tumor = []
     pc_data = []
@@ -89,10 +124,10 @@ def compute_GEdistances(sample_path,PC_path,tissues):
     Rt = []
     #D = []
     for t_id in tissues:
-        pc_data,ind_normal,ind_tumor = read_PCdata(sample_path,PC_path,t_id,1)
+        pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,t_id,1)
         Xn = np.mean(pc_data[ind_normal])
         Rn.append(np.std(pc_data[ind_normal]))
-        Xt.append(np.mean(pc_data[ind_tumor]) - Xn)
+        Xt.append(abs(np.mean(pc_data[ind_tumor]) - Xn))
         Rt.append(np.std(pc_data[ind_tumor]- Xn))  
     Xt = np.array(Xt, dtype="f")      
     Rn = np.array(Rn, dtype="f")   
@@ -101,25 +136,49 @@ def compute_GEdistances(sample_path,PC_path,tissues):
     return Xt,Rn,Rt#,D
 
 
+#def find_indexes()
+
+ #   return indexes
+
 # Reading and processing all the data ---------------------------------------
 
-nameCLR,risk,Nsc,msc = read_CLRdata(CLR_path+CLR_file)
+D = read_D(D_file)
+print(D)
+nameCLRm,risk_m,Nsc,msc = read_CLRm(CLR_path+CLRm_file)
+print(nameCLRm)
+nameCLRr,risk_r,error_r = read_CLRr(CLR_path+CLRr_file)
 t0 = np.log2(Nsc)
-t = t0 + msc*80 #total number of stem cell divisions
-risk = risk/Nsc #risk per stem cell
+t = t0 + msc*80#lifetime #total number of stem cell divisions
+risk_m = risk_m/Nsc #risk per stem cell
 
-aref = 2e-14             #reference value
-ERS = risk/(aref*(t0+t)) #extra risk score
+aref = 2e-14          #reference value
+ERS = risk_m/(aref*t) #extra risk score
 
 #working with PCA data
-pc_data,ind_normal,ind_tumor = read_PCdata(sample_path,PC_path,tissue_id,Npc)
+pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue_id,Npc)
 pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
 Xt,Rn,Rt = compute_GEdistances(sample_path,PC_path,tissues_PCA)
+R=Xt-(Rt+Rn)
+
+indexes_m= []
+for t_clr in tissues_CLRm:
+    for i in range(len(nameCLRm)):
+        if t_clr==nameCLRm[i]: indexes_m.append(i)
+print(nameCLRm[indexes_m])
+indexes_r= []
+for t_clr in tissues_CLRr:
+    for i in range(len(nameCLRr)):
+        if t_clr in nameCLRr[i]: indexes_r.append(i)
+print(nameCLRr[indexes_r])
+
+log_risk = np.log(risk_r[indexes_r]/Nsc[indexes_m])
+print(log_risk)
+print(np.log(D*t[indexes_r]/R))
 
 
 # Exporting readable data ------------------------------------------------------
 
-sl = max(np.char.str_len(nameCLR)) #maximum number of characters of nameCLR
+sl = max(np.char.str_len(nameCLRm)) #maximum number of characters of nameCLRm
 
 with open('ERS_dat.dat','w+') as savefile:
     savefile.write('In this file are listed the values of ERS for each tissue.\n\n')
@@ -127,9 +186,9 @@ with open('ERS_dat.dat','w+') as savefile:
     for i in range(sl-6):
         savefile.write(' ')
     savefile.write('\tERS\n')
-    for i in range(len(nameCLR)):
-        savefile.write(" %s" %nameCLR[i])
-        for k in range(sl-len(nameCLR[i])):
+    for i in range(len(nameCLRm)):
+        savefile.write(" %s" %nameCLRm[i])
+        for k in range(sl-len(nameCLRm[i])):
             savefile.write(' ')
         savefile.write("\t%f\n" %ERS[i])
     savefile.write('\n')
@@ -137,12 +196,17 @@ with open('ERS_dat.dat','w+') as savefile:
 
 with open('GE_dat.dat','w+') as savefile:
     savefile.write('In this file are listed the values of GE for each tissue.\n\n')
-    savefile.write('Tissue\tXt\t\tRn\t\tRt\n')
+    savefile.write('Tissue\tXt\t\tRn\t\tRt\t\tR\t\tD\t\tNsc\t\tmsc\t\trisk\n')
     for i in range(len(tissues_PCA)):
         savefile.write(' '+tissues_PCA[i]+'\t')
         savefile.write('%f\t' % Xt[i])
         savefile.write('%f\t' % Rn[i])
-        savefile.write('%f\n' % Rt[i])
+        savefile.write('%f\t' % Rt[i])
+        savefile.write('%f\t' % R[i])
+        savefile.write('%f\t' % D[i])
+        savefile.write('%f\t' % Nsc[indexes_m[i]])
+        savefile.write('%f\t' % msc[indexes_m[i]])
+        savefile.write('%f\n' % risk_r[indexes_r[i]])
     savefile.write('\n')
     savefile.close()
 
@@ -160,9 +224,9 @@ x2 = 1e4
 plt.loglog([x1, x2],[r11, r12],color='r',linestyle = 'dashed')
 plt.loglog([x1, x2],[r21, r22],color='r',linestyle = 'dashed')
 
-plt.loglog(t,risk,linestyle='none',marker='o')
+plt.loglog(t,risk_m,linestyle='none',marker='o')
 for i in range(len(t)):
-    plt.annotate(nameCLR[i], (t[i], risk[i]))
+    plt.annotate(nameCLRm[i], (t[i], risk_m[i]))
 
 plt.xlabel('t0+msc*80yrs')
 plt.ylabel('Lifetime risk/Nsc')
@@ -193,21 +257,12 @@ plt.savefig('ge'+tissue_id+'_fitness_fig.pdf')
 plt.clf() # clear the plot
 
 # plotting Brownian and Levy Correlation ----------------------------
-D = np.loadtxt('tissues_data.txt')
-D = np.array(D, dtype="f")   
-
-indexes= []
-for t_clr in tissues_CLR:
-    ind = np.where(nameCLR == t_clr)
-    indexes.append(ind[0][0])
-
-log_risk = np.log(risk[indexes])
 
 #Calculate x for Brownian oscilations plot
-x_b = np.array(-2*(D*t[indexes]/Rn)**-2 + np.log(D*t[indexes]/Rn), dtype="f")  
+x_b = np.array(-2*(D*t[indexes_m]**0.5/R)**-2 + np.log(D*t[indexes_m]**0.5/R), dtype="f")  
 
 #Calculate x for large Levy jumps
-x_l = np.array(np.log(D*t[indexes]/Rn), dtype="f")  
+x_l = np.array(np.log(D*t[indexes_m]/R), dtype="f")  
 
 #Prepare scatter plot for Brownian oscilations
 plt.scatter(x_b, log_risk, label = 'Data')
@@ -221,7 +276,7 @@ label = 'Linear fit',
 linestyle='dashed')
 
 #Set plot parameters
-plt.xlabel('-2Dt/Rn^-2 + ln(Dt/Rn)')
+plt.xlabel('-2(Dt^0.5/R)^-2 + ln(Dt**0.5/R)')
 plt.ylabel('ln(Risk/Nsc)')
 plt.tight_layout()
 plt.legend(loc=3)
@@ -230,8 +285,9 @@ plt.savefig('brownian_fig.pdf')
 plt.clf() # clear the plot
 
 #Prepare scatter plot for large Levy jumps
-#p1 = plt.scatter(x_l, y, label = 'Data')
 plt.scatter(x_l, log_risk, label = 'Data')
+for i in range(len(x_l)):
+    plt.annotate(tissues_PCA[i], (x_l[i], log_risk[i]))
 
 #Linear fit for large Levy jumps
 m = 1

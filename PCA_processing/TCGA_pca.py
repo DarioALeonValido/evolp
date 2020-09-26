@@ -112,9 +112,16 @@ elif(len(data) < Ngen):
 
 print("Computing PCA components...")
 if(lite_version):
-    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data,normal)
+    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data)
+
+    radius_pc1_normal, center_pc1_normal = pca.region(projection[0,normal])
+    radius_pc1_tumor, center_pc1_tumor = pca.region(projection[0,tumor])
+    radius_pc2_normal, center_pc2_normal = pca.region(projection[1,normal])
+    radius_pc2_tumor, center_pc2_tumor = pca.region(projection[1,tumor])
+    theta = np.linspace(0, 2*np.pi, 100)
+
 else:
-    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data,normal,True)
+    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data,True)
 
 index = np.argpartition(-np.abs(eigenvectors[:, 0]), Npc)[:Npc]
 components = eigenvectors[index, 0]
@@ -132,37 +139,27 @@ if(lite_version):
     np.savetxt('evec-t'+tissue_id+'_dat.dat', eigenvectors, fmt='%f')
     np.savetxt('ind20'+tissue_id+'_dat.dat', index, fmt='%i')
     np.savetxt('pc20'+tissue_id+'_dat.dat', components, fmt='%f')
-    np.savetxt('ngenes_dat.dat', np.transpose([index, genes_id[index], components]), delimiter="\t", fmt="%s")
+    np.savetxt('ngenes_dat.dat', np.transpose([index,genes_id[index],components]), delimiter="\t", fmt="%s")
     np.savetxt('ind-normal'+tissue_id+'_dat.dat', normal, fmt='%i')
     np.savetxt('ind-tumor'+tissue_id+'_dat.dat', tumor, fmt='%i')
-
-    radio_pc1_normal, center_pc1_normal = pca.region(projection[0,normal])
-    radio_pc1_tumor, center_pc1_tumor = pca.region(projection[0,tumor])
-    radio_pc2_normal, center_pc2_normal = pca.region(projection[1,normal])
-    radio_pc2_tumor, center_pc2_tumor = pca.region(projection[1,tumor])
-    theta = np.linspace(0, 2*np.pi, 100)
 
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()
     
-    ax1.scatter(projection[0,normal], -projection[1,normal], c='b', s=15,label="Normal")
-    ax1.scatter(projection[0,tumor], -projection[1,tumor], c='r', s=15,label="Tumor")
-    ax1.plot(center_pc1_normal + radio_pc1_normal*np.cos(theta), center_pc2_normal + radio_pc2_normal*np.sin(theta), alpha=0.7)
-    ax1.plot(center_pc1_tumor + radio_pc1_tumor*np.cos(theta), center_pc2_tumor + radio_pc2_tumor*np.sin(theta), alpha=0.7)
-    
-    ax1.grid()
-    ax1.set_xlabel('PC1')
-    ax1.set_ylabel('-PC2')
-    ax1.legend()
-    
+    ax1.scatter(projection[0,normal], -projection[1,normal], c='b',s=15,label="Normal")
+    ax1.scatter(projection[0,tumor], -projection[1,tumor], c='r',s=15,label="Tumor")
+    ax1.plot(center_pc1_normal+radius_pc1_normal*np.cos(theta),center_pc2_normal+radius_pc2_normal*np.sin(theta),alpha=0.7)
+    ax1.plot(center_pc1_tumor+radius_pc1_tumor*np.cos(theta),center_pc2_tumor+radius_pc2_tumor*np.sin(theta),alpha=0.7)
+       
     for i in index:
         ax2.plot([i,i],[0, eigenvectors[i,0]], color='k')
-    
-    ax2.grid()
-    
-    plt.tight_layout()
-    
-    fig1.savefig(tissue_id+'_PC2_Vs_PC1_fig.png')
+
+    ax1.set_title(tissue_id), ax1.grid(), ax1.set_xlabel('PC1'), ax1.set_ylabel('-PC2'), ax1.legend()
+    ax2.set_title(tissue_id), ax2.grid(), ax2.set_xlabel('Genes'), ax2.set_ylabel('PC1')
+    fig1.tight_layout() 
+    fig2.tight_layout() 
+      
+    fig1.savefig(tissue_id+'_PC2_vs_PC1_fig.png')
     fig2.savefig(tissue_id + "_PC1_fig.png")
 else:
     np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection, fmt='%f')
