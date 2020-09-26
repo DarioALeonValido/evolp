@@ -6,6 +6,7 @@
 # uncompressed data #
 ###################
 *.FPKM.txt
+MANIFEST.txt
 *bed
  
 # Compiled source #
