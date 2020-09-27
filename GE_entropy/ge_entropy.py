@@ -34,8 +34,6 @@ def read_data(srcpc,srcsampl):
             wbpc,wbsampl = xl.open_workbook(srcpc+"pc"+name+".xls"),xl.open_workbook(srcsampl+"sample"+name+".xls")
             wspc,wssampl = wbpc.sheet_by_index(0),wbsampl.sheet_by_index(0)
             minrows=min(wssampl.nrows,wspc.nrows)
-            #"PCPG" gives a mistmach of 80 rows! So for now should be avoided.
-            #print(name,-wssampl.nrows+wspc.nrows)
             for row in range(1,minrows):
                 if (wssampl.cell_value(row,3)=='Solid Tissue Normal'):
                     data[name]['normal'].append(wspc.row_values(row-1))
@@ -231,8 +229,7 @@ if __name__ == "__main__":
     data, missmatch_pc_samples=read_data(srcpc,srcsampl)
     core_matrix = _transpose_data(data)
 
-    EXCLUSION_LIST =['PCPG','READ','ESCA','CESC','ADREN','GBM','PAAD','BLCA']# BECAUSE FEW 'normal' SAMPLES, OTHERWISE EMPTY. 
-    EXCLUSION_LIST.append('PCPG') # EXCLUDED BECAUSE ROWS MISSMATCH BETWEEN SAMPLES AND PC
+    EXCLUSION_LIST =['READ','ESCA','CESC','GBM','PAAD','BLCA']# BECAUSE FEW 'normal' SAMPLES, OTHERWISE EMPTY. 
 
     _PC_pair_plot(core_matrix, 1, 2,'LUSC') 
 

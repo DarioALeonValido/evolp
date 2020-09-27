@@ -45,5 +45,5 @@ Small_Intestine		0.0007		1.7e10		1e8		36		2920		2.922e11
 Testicular		0.0037		2.16e10		7.2e6		5.8		463		3.348e9
 Thyroid_Papillary	0.01026		1e10		6.5e7		0.087		7		5.850e8
 Thyroid_Medullary	0.000324	10e9		6.5e6		0.87		7		5.850e7	
-Breast			0.1116		6.8e11		8.7e9		4.32		345.6		3.006e12
-Prostate	        0.1804		3e10		2.1e8		3		240		7.2e12
+Breast			0.092283	6.8e11		8.7e9		4.32		345.6		3.006e12
+Prostate	        0.13712		3e10		2.1e8		3		240		7.2e12

@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 # General variables -----------------------------------------------
 
 Npc = 2
-lifetime=85
+lifetime=80
 tissue_id = 'COAD'
 tissues_PCA = ['BRCA','COAD','ESCA','HNSC','LIHC','LUAD','PRAD','THCA']
 tissues_CLRm = ['Breast','Colorectal','Esophageal','Head&Neck','Hepatocellular','Lung','Prostate','Thyroid_Papillary']
@@ -125,9 +125,12 @@ def compute_GEdistances(sample_path,PC_path,tissues):
     for t_id in tissues:
         pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,t_id,1)
         Xn = np.mean(pc_data[ind_normal])
-        Rn.append(np.std(pc_data[ind_normal],dtype="f"))
+        Rn.append(np.std(pc_data[ind_normal],ddof=1))
+        #for i in range(len[ind_normal]):
+        #    sdev
+        #print()
         Xt.append(abs(np.mean(pc_data[ind_tumor]) - Xn))
-        Rt.append(np.std(pc_data[ind_tumor]- Xn,dtype="f"))  
+        Rt.append(np.std(pc_data[ind_tumor]-Xn,ddof=1))  
     Xt = np.array(Xt, dtype="f")      
     Rn = np.array(Rn, dtype="f")   
     Rt = np.array(Rt, dtype="f")   
@@ -148,7 +151,7 @@ risk_m = risk_m/Nsc   #risk per stem cell
 aref = 2e-14          #reference value
 ERS = risk_m/(aref*t) #extra risk score
 
-print("Done!\nLoading Principal Componets for tissues:") #working with PCA data
+print("Done!\nLoading Principal Componets for:") #working with PCA data
 pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue_id,Npc)
 pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
 Xt,Rn,Rt = compute_GEdistances(sample_path,PC_path,tissues_PCA)
