@@ -221,6 +221,7 @@ def _complexity_map(mean, covariance_matrix ,DIMENSION, EXCLUSION_LIST):
     plt.ylabel(r"$-\ln \,I$")
     plt.title("Overlap $vs$ Entropy")
     pylab.legend(loc='lower left')
+    plt.tight_layout()
     plt.savefig('overlapentropy_fig.pdf')   
     
     return fit
@@ -230,7 +231,7 @@ if __name__ == "__main__":
     data, missmatch_pc_samples=read_data(srcpc,srcsampl)
     core_matrix = _transpose_data(data)
 
-    EXCLUSION_LIST =['PCPG','READ','ESCA','CESC', 'ADREN', 'GBM', 'PAAD', 'BLCA']# BECAUSE FEW 'normal' SAMPLES, OTHERWISE EMPTY. 
+    EXCLUSION_LIST =['PCPG','READ','ESCA','CESC','ADREN','GBM','PAAD','BLCA']# BECAUSE FEW 'normal' SAMPLES, OTHERWISE EMPTY. 
     EXCLUSION_LIST.append('PCPG') # EXCLUDED BECAUSE ROWS MISSMATCH BETWEEN SAMPLES AND PC
 
     _PC_pair_plot(core_matrix, 1, 2,'LUSC') 
