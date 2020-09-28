@@ -146,10 +146,11 @@ nameCLRm,risk_m,Nsc,msc = read_CLRm(CLR_path+CLRm_file)
 print("Done!\nLoading cancer risks for tissues:")
 nameCLRr,risk_r,error_r = read_CLRr(CLR_path+CLRr_file)
 t0 = np.log2(Nsc)
-t = t0 + msc*lifetime #total number of stem cell divisions
-risk_m = risk_m/Nsc   #risk per stem cell
-aref = 2e-14          #reference value
-ERS = risk_m/(aref*t) #extra risk score
+t_r = t0 + msc*lifetime #total number of stem cell divisions
+t_m = t0 + msc*80
+risk_m = risk_m/Nsc     #risk per stem cell
+aref = 2e-14            #reference value
+ERS = risk_m/(aref*t_m) #extra risk score
 
 print("Done!\nLoading Principal Componets for:") #working with PCA data
 pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue_id,Npc)
@@ -168,8 +169,8 @@ for t_clr in tissues_CLRr:
 
 log_risk = np.log(risk_r[indexes_r]/Nsc[indexes_m])
 
-x_brownian=np.array(-2*(D*t[indexes_m]**0.5/R)**-2+np.log(D*t[indexes_m]**0.5/R), dtype="f")  
-x_levy = np.array(np.log(D*t[indexes_m]/R), dtype="f")  
+x_brownian=np.array(-2*(D*t_m[indexes_m]**0.5/R)**-2+np.log(D*t_m[indexes_m]**0.5/R), dtype="f")  
+x_levy = np.array(np.log(D*t_r[indexes_m]/R), dtype="f")  
 m_brownian, b_brownian=np.polyfit(x_brownian,log_risk,1) #Linear fit for Brownian
 m_levy=1; n_levy=np.mean(log_risk-m_levy*x_levy)         #Linear fit for Levy jumps
 
@@ -220,11 +221,11 @@ x2 = 1e4
 plt.loglog([x1, x2],[r11, r12],color='r',linestyle = 'dashed')
 plt.loglog([x1, x2],[r21, r22],color='r',linestyle = 'dashed')
 
-plt.loglog(t,risk_m,linestyle='none',marker='o')
-for i in range(len(t)):
-    plt.annotate(nameCLRm[i],(t[i],risk_m[i]),xytext=(t[i],risk_m[i]), ha='center')
+plt.loglog(t_m,risk_m,linestyle='none',marker='o')
+for i in range(len(t_m)):
+    plt.annotate(nameCLRm[i],(t_m[i],risk_m[i]), ha='center')
 
-plt.xlabel('t0+msc*'+str(lifetime)+'yrs')
+plt.xlabel('t0+msc*'+str(80)+'yrs')
 plt.ylabel('Lifetime risk/Nsc')
 plt.tight_layout()
 plt.savefig('risk-lifetime_fig.pdf')
@@ -260,7 +261,7 @@ plt.plot([np.min(x_brownian),np.max(x_brownian)],
 [m_brownian*np.min(x_brownian),m_brownian*np.max(x_brownian)]+b_brownian,
 color='r', label='Linear fit', linestyle='dashed')
 
-plt.xlabel('-2(Dt^0.5/R)^-2 + ln(Dt**0.5/R)')
+plt.xlabel('-2(Dt^0.5/R)^-2 + ln(Dt^0.5/R)')
 plt.ylabel('ln(Risk/Nsc)')
 plt.tight_layout()
 plt.legend(loc=3)

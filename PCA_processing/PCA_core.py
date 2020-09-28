@@ -38,7 +38,7 @@ def PC_decomp_mem(data, sparse_data, max_size):
 
 def region(data):
     center = np.mean(data)
-    radius = np.std(data)
+    radius = np.std(data,ddof=1)
     
     return([radius, center])
 
