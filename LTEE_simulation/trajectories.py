@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 At the moment, this script file reproduce some of the 
 figures present in paper doi:10.1038/nature24287
@@ -80,8 +79,7 @@ plt.ylabel('Fitness')
 plt.tight_layout()
 plt.legend()
 plt.savefig('Ws_fig.png')
-#plt.show() 
-plt.clf() # clear the plot
+plt.clf()
 
 
 # plotting Ms ----------------------------
@@ -101,7 +99,7 @@ plt.ylabel('Mutations')
 plt.tight_layout()
 plt.legend()
 plt.savefig('Ms_fig.png')
-#plt.show() 
+
 
 # Quick Note ----------------------------
 print("\nAt the moment we are plotting just the \nexperimental data we want to reproduce")

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This script file processes available CNV data 
 of over 100,000 European ancestry subjects.

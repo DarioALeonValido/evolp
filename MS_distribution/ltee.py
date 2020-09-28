@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This script file processes mutation data from the LTEE.
 The output figures are versions of the ones in paper
@@ -202,8 +201,7 @@ plt.tight_layout()
 plt.legend()
 plt.xlim(0, 20250)
 plt.savefig(plot_id+'mut-SP_20K_fig.pdf')
-#plt.show() 
-plt.clf() # clear the plot
+plt.clf()
 
 
 # plotting SP up to 40K ----------------------------
@@ -233,8 +231,7 @@ plt.ylabel('Number of SPMs')
 plt.tight_layout()
 plt.legend()
 plt.savefig(plot_id+'mut-SP_40K_fig.pdf')
-#plt.show() 
-plt.clf() # clear the plot
+plt.clf()
 
 
 # plotting LR 2K to 50K ----------------------------
@@ -253,8 +250,7 @@ plt.ylabel('Number of Rearrangements')
 plt.tight_layout()
 plt.legend()
 plt.savefig(plot_id+'mut-LR_2-50K_fig.pdf')
-#plt.show() 
-plt.clf() # clear the plot
+plt.clf()
 
 
 # plotting LR sizes --------------------------------------
@@ -284,5 +280,4 @@ plt.ylabel('Cumulative Probability of Large Rearrangements')
 plt.tight_layout()
 plt.legend(loc='upper right')
 plt.savefig(plot_id+'mut-LR_distribution_fig.pdf')
-#plt.show() 
 
