@@ -80,7 +80,7 @@ def read_CLRr(wb_name):
         error.append(clr_ws.cell_value(-1,i))
     name = np.array(name)
     risk = np.array(risk, np.float)
-    error = np.array(risk, np.float)
+    error = np.array(error, np.float)
   
     return(name,risk,error)
           
@@ -126,9 +126,6 @@ def compute_GEdistances(sample_path,PC_path,tissues):
         pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,t_id,1)
         Xn = np.mean(pc_data[ind_normal])
         Rn.append(np.std(pc_data[ind_normal],ddof=1))
-        #for i in range(len[ind_normal]):
-        #    sdev
-        #print()
         Xt.append(abs(np.mean(pc_data[ind_tumor]) - Xn))
         Rt.append(np.std(pc_data[ind_tumor]-Xn,ddof=1))  
     Xt = np.array(Xt, dtype="f")      
@@ -195,7 +192,7 @@ with open('geERS_dat.dat','w+') as savefile:
 
 with open('geData_dat.dat','w+') as savefile:
     savefile.write('In this file are listed the values of GE for each tissue.\n\n')
-    savefile.write('Tissue\tXt\t\tRn\t\tRt\t\tR\t\tD\t\trisk\n')
+    savefile.write('Tissue\tXt\t\tRn\t\tRt\t\tR\t\tD\t\t<risk>\t\t<dev>\n')
     for i in range(len(tissues_PCA)):
         savefile.write(' '+tissues_PCA[i]+'\t')
         savefile.write('%f\t' % Xt[i])
@@ -203,7 +200,8 @@ with open('geData_dat.dat','w+') as savefile:
         savefile.write('%f\t' % Rt[i])
         savefile.write('%f\t' % R[i])
         savefile.write('%f\t' % D[i])
-        savefile.write('%f\n' % risk_r[indexes_r[i]])
+        savefile.write('%f\t' % risk_r[indexes_r[i]])
+        savefile.write('%f\n' % error_r[indexes_r[i]])
     savefile.write('\n')
     savefile.close()
 
