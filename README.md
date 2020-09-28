@@ -1,4 +1,4 @@
-# evol_p
+# evolp
 Data Processing, Modeling and Simulation of Evolutionary Phenomena.
 
 The present repository is develop within the project directed by 
