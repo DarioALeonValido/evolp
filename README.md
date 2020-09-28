@@ -1,7 +1,7 @@
 # evolp
 Data Processing, Modeling and Simulation of Evolutionary Phenomena.
 
-The present repository is develop within the project directed by 
+The present repository is developed within the project directed by 
 Prof. Augusto Gonzalez from the Institute of Cybernetics, 
 Mathematics and Physics, Havana, Cuba. It is aimed at collecting 
 computational tools and data, that hopefully are useful to study 
