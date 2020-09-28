@@ -3,6 +3,11 @@
 *_fig.*
 *_dat.*
 
+# uncompressed data #
+###################
+*.FPKM.txt
+MANIFEST.txt
+*bed
  
 # Compiled source #
 ###################
@@ -15,6 +20,7 @@
 *.dep
 *.f90
 *pyc
+___pycache__
 
 # source #
 ##########
@@ -47,6 +53,7 @@ commit.msg
 
 # OS generated files #
 ######################
+.~*
 .DS_Store
 .DS_Store?
 ._*

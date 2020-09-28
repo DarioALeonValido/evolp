@@ -1,0 +1,8 @@
+the '..._Table1.dat' file correspond with Table 1 of SI of
+paper https://doi.org/10.1126/science.1260825 where we added
+data on 'Brest' and 'Prostate' tissues and updated 'Esophageal' 
+with SI of paper https://doi.org/10.1126/science.aaf9011
+
+'.xlsx' files correspond with tables S1-4 of SI of paper
+https://doi.org/10.1126/science.aaf9011  where we added two 
+extra rows for computing mean and standard deviation values.

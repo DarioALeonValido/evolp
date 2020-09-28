@@ -1,0 +1,24 @@
+Inside the current directory we store the collection of data that 
+we may want to use from TCGA databases. 
+
+The 'sample' files are already included in our repository and
+describe the list of txt files that 'data' folders should contain.
+
+In order for the repository scripts to work without having to make 
+any modification to them, it is necessary that the files be 
+downloaded directly into each folder, without making any kind of 
+subdirectory or modification in the names.
+
+The 'KIRC' data is already included in its corresponding folder 
+in two compressed files with tar.xz format. This is the default 
+example used to illustrate the PCA technique. Nevertheless, the
+data need to be uncompressed before running the script without
+making any subdirectory, as mentioned before.
+
+The rest of the examples can be downloaded directly from the TCGA 
+website by following the specific link that is found within each
+'data' folder. One possible way to get the files is to add them all
+to the cart, go to the cart and click the download button. Note 
+that the Sample Sheets are also available, they must match those 
+already provided in our repository. Again, be sure to use the 
+correct paths and names. 

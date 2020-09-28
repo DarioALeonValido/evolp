@@ -1,0 +1,12 @@
+Fixed mutations in mixed-population samples.
+Number of mutations (with fr > 96%) extracted from
+figure 5 of paper https://doi.org/10.1101/sqb.2009.74.018
+
+ gen    num
+ 2000	 2
+ 5000	 5
+ 10000	 8
+ 15000	 7
+ 20000	 25
+ 30000	 234
+ 40000	 255
