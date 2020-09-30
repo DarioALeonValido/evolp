@@ -32,7 +32,7 @@ Hepatocellular_HCV	0.071		2.41e11		3.01e9		0.9125		88		2.709e11
 Lung			0.0045		4.34e11		1.22e9		0.07		5.6		9.272e9
 Lung_Smoker		0.081		4.34e11		1.22e9		0.07		5.6		9.272e9
 Medulloblastoma		0.00011		8.5e10		1.36e8		0		0		2.72e8
-Mellanoma		0.0203		3.8e9		3.8e9		2.48		199		7.638e11
+Melanoma		0.0203		3.8e9		3.8e9		2.48		199		7.638e11
 Osteosarcoma		0.00035		1.9e9		4.18e6		0.067		5		2.926e7
 Osteosarcoma_Arms	0.00004		3e8		6.5e5		0.067		5		4.55e6
 Osteosarcoma_Head	0.0000302	3.9e8		8.6e5		0.067		5		6.02e6
@@ -44,6 +44,6 @@ Pancreatic_Endocrine	0.000194	2.95e9		7.4e7		1		80		6.068e9
 Small_Intestine		0.0007		1.7e10		1e8		36		2920		2.922e11
 Testicular		0.0037		2.16e10		7.2e6		5.8		463		3.348e9
 Thyroid_Papillary	0.01026		1e10		6.5e7		0.087		7		5.850e8
-Thyroid_Medullary	0.000324	10e9		6.5e6		0.87		7		5.850e7	
+Thyroid_Medullary	0.000324	10e9		6.5e6		0.087		7		5.850e7	
 Breast			0.092283	6.8e11		8.7e9		4.32		345.6		3.006e12
 Prostate	        0.13712		3e10		2.1e8		3		240		7.2e12
