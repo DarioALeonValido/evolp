@@ -1,5 +1,7 @@
+The present data on European ancestry CNV comes from paper
+https://doi.org/10.1038/s41467-019-13624-1
+
 Please, uncompress the data before running the CNV script:
 ../evol_p/databases_external/CNV/eur_CNV.bed.tar.xz
-
 ~73MiB of available space will be needed.
 

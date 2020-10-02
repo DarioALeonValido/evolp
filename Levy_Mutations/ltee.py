@@ -160,7 +160,7 @@ for i in range(len(cnumLRu)):
 # Exporting data ------------------------------------------------------
 
 with open(plot_id+"Ara-1_mut-SP_total_dat.dat", "w+") as file:
-    file.write("Number of total mutations in mixed-population samples\n\n")
+    file.write("An estimate for the total number of SPM in mixed-population samples of the LTEE\n\n")
     file.write(" gen\tnum\n")
     for x in zip(genF, mutT):
         file.write(" {0}\t{1}\n".format(*x))
