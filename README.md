@@ -1,5 +1,5 @@
 # evolp
-Data Processing, Modeling and Simulation of Evolutionary Phenomena.
+Processing and Analyzing Mutations and Gene Expression Data in Different Systems.
 
 The present repository is developed within the project directed by 
 Prof. Augusto Gonzalez from the Institute of Cybernetics, 
