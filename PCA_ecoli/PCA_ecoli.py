@@ -44,33 +44,28 @@ def read_expression(datapath,ge_file,ncol):
             for j in range(ncol):
                 ara[j].append(line.split()[j+1])     
         gene = np.array(gene)
-        ara = -np.array(ara, dtype="f") +0.0001
-        araP = ara[:8]
+        ara = 10**np.array(ara, dtype="f") +0.00001
         anc=[0,1,2,3,8,9,10,11]
         ref = gmean(ara[anc])
         ara = np.log2(ara/ref)
-        ancP=[0,1,2,3]
-        refP = gmean(araP[ancP])
-        araP = np.log2(araP/refP)
 
-    return gene,ara,araP
+    return gene,ara
 
 
 # Reading and processing the data ------------------------------------------
 
 print("Reading files from databases:")
-gene,ara,araP = read_expression(datapath,ge_file,16)
+gene,ara = read_expression(datapath,ge_file,16)
 print('Number of genes: ', len(gene))
 print('Number of samples: ', len(ara))
 print("Data successfully loaded!")
 
 print("Computing PCA components...")
 eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(ara)
-eigenvaluesP,eigenvectorsP,eigenvalues_normalizedP,projectionP = pca.PC_decomp(araP)
-radius_pc1_normal, center_pc1_normal = pca.region(projection[0,[0,1,2,3,8,9,10,11]])
-radius_pc1_tumor, center_pc1_tumor = pca.region(projection[0,[4,5,6,7,12,13,14,15]])
-radius_pc2_normal, center_pc2_normal = pca.region(projection[1,[0,1,2,3,8,9,10,11]])
-radius_pc2_tumor, center_pc2_tumor = pca.region(projection[1,[4,5,6,7,12,13,14,15]])
+radius_pc1_anc, center_pc1_anc = pca.region(projection[0,[0,1,2,3,8,9,10,11]])
+radius_pc1_evol, center_pc1_evol = pca.region(projection[0,[4,5,6,7,12,13,14,15]])
+radius_pc2_anc, center_pc2_anc = pca.region(projection[1,[0,1,2,3,8,9,10,11]])
+radius_pc2_evol, center_pc2_evol = pca.region(projection[1,[4,5,6,7,12,13,14,15]])
 theta = np.linspace(0, 2*np.pi, 100)
 
 index = np.argpartition(-np.abs(eigenvectors[:, 0]), Npc)[:Npc]
@@ -86,25 +81,19 @@ np.savetxt('evec_dat.dat', eigenvectors.T, fmt='%f')
 np.savetxt('eval-n_dat.dat', eigenvalues_normalized, fmt='%f')
 np.savetxt('eval_dat.dat', eigenvalues, fmt='%f')
 np.savetxt('evec-t_dat.dat', eigenvectors, fmt='%f')
-#np.savetxt('ind20'+tissue_id+'_dat.dat', index, fmt='%i')
-#np.savetxt('pc20'+tissue_id+'_dat.dat', components, fmt='%f')
+np.savetxt('ind20_dat.dat', index, fmt='%i')
+np.savetxt('pc20_dat.dat', components, fmt='%f')
 np.savetxt('ngenes_dat.dat', np.transpose([index,gene[index],components]), delimiter="\t", fmt="%s")
-#np.savetxt('ind-normal'+tissue_id+'_dat.dat', normal, fmt='%i')
-#np.savetxt('ind-tumor'+tissue_id+'_dat.dat', tumor, fmt='%i')
 
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
-fig1P, ax1P = plt.subplots()
     
-ax1.scatter(projection[0,[0,1,2,3]], -projection[1,[0,1,2,3]], c='b',s=25,label="Ara+(anc)")
-ax1.scatter(projection[0,[8,9,10,11]],-projection[1,[8,9,10,11]],s=25,label="Ara-(anc)",facecolors='none',edgecolors='b')
-ax1.scatter(projection[0,[4,5,6,7]],-projection[1,[4,5,6,7]], c='r',s=25,label="Ara+(evol)")
-ax1.scatter(projection[0,[12,13,14,15]],-projection[1,[12,13,14,15]],s=25,label="Ara-(evol)",facecolors='none',edgecolors='r')
-ax1.plot(center_pc1_normal+radius_pc1_normal*np.cos(theta),center_pc2_normal+radius_pc2_normal*np.sin(theta),alpha=0.7)
-ax1.plot(center_pc1_tumor+radius_pc1_tumor*np.cos(theta),center_pc2_tumor+radius_pc2_tumor*np.sin(theta),alpha=0.7)
-
-ax1P.scatter(projectionP[0,[0,1,2,3]], projectionP[1,[0,1,2,3]], c='b',s=15,label="Ara+(anc)")
-ax1P.scatter(projectionP[0,[4,5,6,7]], -projectionP[1,[4,5,6,7]], c='r',s=15,label="Ara+(evol)")
+ax1.scatter(-projection[0,[0,1,2,3]], -projection[1,[0,1,2,3]], c='b',s=25,label="Ara+(anc)")
+ax1.scatter(-projection[0,[8,9,10,11]],-projection[1,[8,9,10,11]],s=25,label="Ara-(anc)",facecolors='none',edgecolors='b')
+ax1.scatter(-projection[0,[4,5,6,7]],-projection[1,[4,5,6,7]], c='r',s=25,label="Ara+(evol)")
+ax1.scatter(-projection[0,[12,13,14,15]],-projection[1,[12,13,14,15]],s=25,label="Ara-(evol)",facecolors='none',edgecolors='r')
+ax1.plot(-center_pc1_anc+radius_pc1_anc*np.cos(theta),-center_pc2_anc+radius_pc2_anc*np.sin(theta),alpha=0.7)
+ax1.plot(-center_pc1_evol+radius_pc1_evol*np.cos(theta),-center_pc2_evol+radius_pc2_evol*np.sin(theta),alpha=0.7)
 
 for i in index:
     ax2.plot([i,i],[0, eigenvectors[i,0]], color='k')
@@ -116,6 +105,5 @@ fig2.tight_layout()
       
 fig1.savefig('_PC2_vs_PC1_fig.png')
 fig2.savefig("_PC1_fig.png")
-fig1P.savefig('AraP_PC2_vs_PC1_fig.png')
 
 print("Done!")
