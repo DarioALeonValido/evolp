@@ -26,7 +26,7 @@ tissues_CLRr = ['breast','colorectal','esophageal','head & neck','hepatocellular
 
 sample_path = '../databases_external/TCGA/'
 PC_path = '../databases_generated/TCGA_pca/'
-CLR_path = '../databases_external/CLR/'
+CLR_path = '../databases_external/Cancer_Risk/'
 CLRm_file = '1260825_Table1.dat'
 CLRr_file = 'aaf9011_Table_y'+str(lifetime)+'.xlsx'
 D_file = 'tissues_D-data.txt'
