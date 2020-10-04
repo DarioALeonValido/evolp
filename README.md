@@ -5,15 +5,15 @@ The present repository is developed within the project directed by
 Prof. Augusto Gonzalez from the Institute of Cybernetics, 
 Mathematics and Physics, Havana, Cuba. It is aimed at collecting 
 computational tools and data, that hopefully are useful to study 
-evolutionary phenomena and to analyze available experimental data.
+mutations and gene expression signatures in different systems.
 
 The repository is released under a GPL version 3 license as 
 stated in the LICENSE file.
 
 The repository is organized in different folders that correspond
-with several works carried out or being carried out in the group.
-We specify the reference articles, either within the group or
-from external sources.
+to several works carried out or being carried on in the group.
+We specify the reference articles, either by the group or
+by external authors.
 
 #! Requirements
 Scripts: Python3 mainly with mathplotlib, numpy, scipy, pylab, xlrd
