@@ -25,7 +25,7 @@ from os.path import *
 
 Npc = 20 #the maximum possible number of PCs is the number of genes
 
-datapath = '../databases_external/LTEE/genes/'
+datapath = '../databases_external/LTEE/Gene_Expression/'
 ge_file = 'expression20k.dat'
 
 
