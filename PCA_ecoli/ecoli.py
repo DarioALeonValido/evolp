@@ -61,7 +61,7 @@ print('Number of samples: ', len(ara))
 print("Data successfully loaded!")
 
 print("Computing PCA components...")
-eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(ara)
+eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(ara)
 radius_pc1_anc, center_pc1_anc = pca.region(projection[0,[0,1,2,3,8,9,10,11]])
 radius_pc1_evol, center_pc1_evol = pca.region(projection[0,[4,5,6,7,12,13,14,15]])
 radius_pc2_anc, center_pc2_anc = pca.region(projection[1,[0,1,2,3,8,9,10,11]])
