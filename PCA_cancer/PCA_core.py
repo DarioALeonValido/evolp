@@ -13,7 +13,7 @@ from scipy.linalg import eigh
 
 # Routines ------------------------------------------------------
 
-def PC_decomp(data, sparse_data = False):
+def PCA_core(data, sparse_data = False):
 
     covariance = np.dot(data.T, data)/np.alen(data)
     if(sparse_data):
@@ -28,7 +28,7 @@ def PC_decomp(data, sparse_data = False):
     return([eigenvalues, eigenvectors, eigenvalues_normalized, projection])
 
 
-def PC_decomp_mem(data, sparse_data, max_size):
+def PCA_core_mem(data, sparse_data, max_size):
 
     #Principal Component decomposition routine with memory boundaries
 

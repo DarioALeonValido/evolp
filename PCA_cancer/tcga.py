@@ -112,7 +112,7 @@ elif(len(data) < Ngen):
 
 print("Computing PCA components...")
 if(lite_version):
-    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data)
+    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data)
 
     radius_pc1_normal, center_pc1_normal = pca.region(projection[0,normal])
     radius_pc1_tumor, center_pc1_tumor = pca.region(projection[0,tumor])
@@ -121,7 +121,7 @@ if(lite_version):
     theta = np.linspace(0, 2*np.pi, 100)
 
 else:
-    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(data,True)
+    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data,True)
 
 index = np.argpartition(-np.abs(eigenvectors[:, 0]), Npc)[:Npc]
 components = eigenvectors[index, 0]
