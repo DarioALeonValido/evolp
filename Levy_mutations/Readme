@@ -1,16 +1,19 @@
-The present directory corresponds with the work done in
-paper arXiv:1605.09697.
+The present directory corresponds to the work done in
+paper arXiv:1605.09697, updated in May 2020.
 
 
 There are two scripts: 'ltee.py', for LTEE data, and 
 'cnv_europeans.py', for European ancestry CNV data.
 
-'ltee.py' reads data on SPM and SNP that is measured 
-during the LTEE experiment and can be found in papers
+'ltee.py' reads data on point mutations and large DNA
+rearrangements that is measured in the LTEE experiment 
+and can be found in papers
 https://doi.org/10.1101/sqb.2009.74.018
 https://doi.org/10.1128/mBio.01377-14 
 
-while 'cnv_europeans.py' reads CNV data found in paper
+'cnv_europeans.py'. on the other hand, reads data on
+copy number variations in individuals of european
+ancestry, found in paper
 https://doi.org/10.1038/s41467-019-13624-1
 
 
