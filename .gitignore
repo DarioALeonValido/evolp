@@ -8,7 +8,7 @@
 *.FPKM.txt
 MANIFEST.txt
 *bed
-*Aging_Brain/gene_expression/*
+databases_external/Aging_Brain/gene_expression/
  
 # Compiled source #
 ###################
