@@ -1,13 +1,12 @@
 """
-This script file applies the PCA technique to the TCGA data at 
-https://www.cancer.gov/tcga
+This script file applies the PCA technique to gen expression data
+measured in the LTEE that can be found at
+http://myxo.css.msu.edu/ecoli/arrays/index.html
 The procedure and main results are described in paper 
 arXiv:1706.09813v3 
-A more general analysis can be found in paper
-arXiv:2003.07828v3 
 
 For more details on this file see author(s):
-JANC, DALV
+DALV, AG
 """
 
 import numpy as np
@@ -42,8 +41,13 @@ def read_expression(datapath,ge_file,ncol):
         for line in lines[1:]:
             gene.append(line.split()[0])
             for j in range(ncol):
-                ara[j].append(line.split()[j+1])     
+                ara[j].append(line.split()[j+1])    
         gene = np.array(gene)
+        ara = np.array(ara, dtype="f")
+        for i in range(len(ara)):
+            for j in range(len(ara[0])):
+                if (ara[i][j]>-0.005):
+                    ara[i][j]=-8.
         ara = 10**np.array(ara, dtype="f") +0.00001
         anc=[0,1,2,3,8,9,10,11]
         ref = gmean(ara[anc])
@@ -63,7 +67,9 @@ print("Data successfully loaded!")
 print("Computing PCA components...")
 eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(ara)
 radius_pc1_anc, center_pc1_anc = pca.region(projection[0,[0,1,2,3,8,9,10,11]])
+print(radius_pc1_anc, center_pc1_anc)
 radius_pc1_evol, center_pc1_evol = pca.region(projection[0,[4,5,6,7,12,13,14,15]])
+print(radius_pc1_evol, center_pc1_evol)
 radius_pc2_anc, center_pc2_anc = pca.region(projection[1,[0,1,2,3,8,9,10,11]])
 radius_pc2_evol, center_pc2_evol = pca.region(projection[1,[4,5,6,7,12,13,14,15]])
 theta = np.linspace(0, 2*np.pi, 100)
@@ -103,7 +109,7 @@ ax2.set_title('Ara'), ax2.grid(), ax2.set_xlabel('Genes'), ax2.set_ylabel('PC1')
 fig1.tight_layout() 
 fig2.tight_layout() 
       
-fig1.savefig('_PC2_vs_PC1_fig.png')
-fig2.savefig("_PC1_fig.png")
+fig1.savefig('Ara_PC2_vs_PC1_fig.png')
+fig2.savefig("Ara_PC1_fig.png")
 
 print("Done!")
