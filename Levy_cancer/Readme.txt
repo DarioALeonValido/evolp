@@ -6,8 +6,11 @@ and a python script 'cancer.py'.
 
 The script 'cancer.py' reads data on lifetime cancer risk,
 number of normal stem cells (Nstem) and annual division rate per stem
-cell (msc) for 31 different tissues. This data can be found in the paper
-https://doi.org/10.1126/science.1260825.
+cell (msc) for 31 different tissues. This data can be found in the papers
+https://doi.org/10.1126/science.1260825 and https://doi.org/10.1126/science.aaf9011.
+It is also available in the databases_external/Cancer_Risk/ section of 
+this repsitory.
+
 
 A second set of data is imported, which includes the results obtained
 by performing a principal component analysis (PCA) on gene expression
