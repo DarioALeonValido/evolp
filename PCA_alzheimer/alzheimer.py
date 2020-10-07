@@ -1,17 +1,16 @@
 """
-This script file applies the PCA technique to the TCGA data at 
-https://www.cancer.gov/tcga
+This script file applies the PCA technique to gen expression data
+on brain ... that can be found at
+https://aging.brain-map.org/download/index
 The procedure and main results are described in paper 
 arXiv:1706.09813v3 
-A more general analysis can be found in paper
-arXiv:2003.07828v3 
 
 For more details on this file see author(s):
-JANC, DALV
+DALV, AG
 """
 
 import numpy as np
-import xlrd as xl
+import csv
 from scipy.stats.mstats import gmean
 import matplotlib.pyplot as plt
 import sys
@@ -24,48 +23,96 @@ from os.path import *
 # General variables ------------------------------------------------------
 
 Npc = 20 #the maximum possible number of PCs is the number of genes
+sample_id = 'FWM'
 
-datapath = '../databases_external/LTEE/genes/'
-ge_file = 'expression20k.dat'
+datapath = '../databases_external/Aging_Brain/gene_expression/'
+donor_file = 'DonorInformation.csv'
+samples_file = 'columns-samples.csv'
+fpkm_file = 'fpkm_table_normalized.csv'
 
 
 # Functions ------------------------------------------------------
 
-def read_expression(datapath,ge_file,ncol):
-    with open(datapath+ge_file, 'r') as gefile:
-        lines = gefile.readlines()
+def read_donor(datapath,donor_file):
+    with open(datapath+donor_file) as dfile:
+        d_csv = csv.reader(dfile,delimiter=',')
 
-        gene = []
-        ara = []
-        for j in range(ncol):
-            ara.append([])   
-        for line in lines[1:]:
-            gene.append(line.split()[0])
-            for j in range(ncol):
-                ara[j].append(line.split()[j+1])     
-        gene = np.array(gene)
-        ara = 10**np.array(ara, dtype="f") +0.00001
-        anc=[0,1,2,3,8,9,10,11]
-        ref = gmean(ara[anc])
-        ara = np.log2(ara/ref)
+        ND_id = []
+        AD_id = []
+        for row in d_csv:
+            if(row[10] == 'No Dementia'):
+                ND_id.append(row[0])
+            elif(row[10] == "Alzheimer's Disease Type"):
+                AD_id.append(row[0])
 
-    return gene,ara
+    ND_id = np.array(ND_id)
+    AD_id = np.array(AD_id)
+
+    return ND_id,AD_id
+
+
+def read_samples(datapath,samples_file,sample_id,ND_id,AD_id):
+    with open(datapath+samples_file) as sfile:
+        s_csv = csv.reader(sfile,delimiter=',')
+
+        index_ND = []
+        index_AD = []
+        i=0
+        for row in s_csv:
+            if(row[1] in ND_id):
+                if(row[8]==sample_id):
+                    index_ND.append(i)
+            elif(row[1] in AD_id):
+                if(row[8]==sample_id):
+                    index_AD.append(i)
+            i=i+1
+
+    index_ND = np.array(index_ND, dtype="i")
+    index_AD = np.array(index_AD, dtype="i")
+
+    return index_ND,index_AD
+
+
+def read_expression(datapath,fpkm_file,index_ND,index_AD):
+    with open(datapath+fpkm_file) as efile:
+        e_csv = csv.reader(efile,delimiter=',')
+
+        data = []
+        for c in np.concatenate((index_ND,index_AD)):
+            data.append([])
+            print('len',len(data))
+            for row in e_csv:
+                data[-1].append(row[c])
+        print('one element', data[0][0])
+        print('one element', data[1][1])
+        data = np.array(data, np.float) + 0.1
+        #data = np.array(data) + 0.1
+        ref = gmean(data[:len(index_ND)-1])
+        data = np.log2(data/ref)
+
+    return data
 
 
 # Reading and processing the data ------------------------------------------
 
-print("Reading files from databases:")
-gene,ara = read_expression(datapath,ge_file,16)
-print('Number of genes: ', len(gene))
-print('Number of samples: ', len(ara))
+print("Reading files from databases...")
+ND_id,AD_id = read_donor(datapath,donor_file)
+index_ND,index_AD = read_samples(datapath,samples_file,sample_id,ND_id,AD_id)
+data = read_expression(datapath,fpkm_file,index_ND,index_AD)
+len_ND = len(index_ND)
+len_AD = len(index_AD)
+print('Number of '+sample_id+' samples:', len_ND+len_AD)
+print('Number of ND cases:', len_ND)
+print('Number of AD cases:', len_AD)
+print('Number of genes:', len(data[0]))
 print("Data successfully loaded!")
 
 print("Computing PCA components...")
-eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PC_decomp(ara)
-radius_pc1_anc, center_pc1_anc = pca.region(projection[0,[0,1,2,3,8,9,10,11]])
-radius_pc1_evol, center_pc1_evol = pca.region(projection[0,[4,5,6,7,12,13,14,15]])
-radius_pc2_anc, center_pc2_anc = pca.region(projection[1,[0,1,2,3,8,9,10,11]])
-radius_pc2_evol, center_pc2_evol = pca.region(projection[1,[4,5,6,7,12,13,14,15]])
+eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data)
+radius_pc1_ND,center_pc1_ND = pca.region(projection[0,range(len_ND)])
+radius_pc1_AD,center_pc1_AD = pca.region(projection[0,range(len_ND,len_ND+len_AD)])
+radius_pc2_ND,center_pc2_ND = pca.region(projection[1,range(len_ND)])
+radius_pc2_AD,center_pc2_AD = pca.region(projection[1,range(len_ND,len_ND+len_AD)])
 theta = np.linspace(0, 2*np.pi, 100)
 
 index = np.argpartition(-np.abs(eigenvectors[:, 0]), Npc)[:Npc]
@@ -76,14 +123,14 @@ print("Done!")
 # Output data and figures --------------------------------------------------
 
 print("Exporting data and plots...")
-np.savetxt('pc_dat.dat', projection, fmt='%f')
-np.savetxt('evec_dat.dat', eigenvectors.T, fmt='%f')
-np.savetxt('eval-n_dat.dat', eigenvalues_normalized, fmt='%f')
-np.savetxt('eval_dat.dat', eigenvalues, fmt='%f')
-np.savetxt('evec-t_dat.dat', eigenvectors, fmt='%f')
-np.savetxt('ind20_dat.dat', index, fmt='%i')
-np.savetxt('pc20_dat.dat', components, fmt='%f')
-np.savetxt('ngenes_dat.dat', np.transpose([index,gene[index],components]), delimiter="\t", fmt="%s")
+np.savetxt(sample_id+'pc_dat.dat', projection, fmt='%f')
+np.savetxt(sample_id+'evec_dat.dat', eigenvectors.T, fmt='%f')
+np.savetxt(sample_id+'eval-n_dat.dat', eigenvalues_normalized, fmt='%f')
+np.savetxt(sample_id+'eval_dat.dat', eigenvalues, fmt='%f')
+np.savetxt(sample_id+'evec-t_dat.dat', eigenvectors, fmt='%f')
+np.savetxt(sample_id+'ind20_dat.dat', index, fmt='%i')
+np.savetxt(sample_id+'pc20_dat.dat', components, fmt='%f')
+np.savetxt(sample_id+'ngenes_dat.dat', np.transpose([index,gene[index],components]), delimiter="\t", fmt="%s")
 
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
