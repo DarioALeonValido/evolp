@@ -9,8 +9,7 @@ number of normal stem cells (Nstem) and annual division rate per stem
 cell (msc) for 31 different tissues. This data can be found in the papers
 https://doi.org/10.1126/science.1260825 and https://doi.org/10.1126/science.aaf9011.
 It is also available in the databases_external/Cancer_Risk/ section of 
-this repsitory.
-
+this repository.
 
 A second set of data is imported, which includes the results obtained
 by performing a principal component analysis (PCA) on gene expression
