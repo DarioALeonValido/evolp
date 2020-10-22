@@ -88,6 +88,7 @@ def read_expression(datapath,fpkm_file,index_ND,index_AD):
             for c in np.concatenate((index_ND,index_AD)):
                 data[-1].append(row[c])
 
+    genes_id = np.array(genes_id)
     data = np.array(data, dtype="f")
     data = data.T + 0.1
     ref = gmean(data[:len(index_ND)])
@@ -104,8 +105,6 @@ index_ND,index_AD = read_samples(datapath,samples_file,sample_id,ND_id,AD_id)
 data,genes_id = read_expression(datapath,fpkm_file,index_ND,index_AD)
 len_ND = len(index_ND)
 len_AD = len(index_AD)
-print(index_ND)
-print(index_AD)
 print('Number of '+sample_id+' samples:', len_ND+len_AD)
 print('Number of ND cases:', len_ND)
 print('Number of AD cases:', len_AD)
@@ -113,14 +112,15 @@ print('Number of genes:', len(genes_id))
 print("Data successfully loaded!")
 
 # reducing the data by Ngen genes for Lite version
-if(lite_version and data.shape[1] > Ngen):
-    print("Lite version: reducing the number of genes by", Ngen)
-    data = data[:, :Ngen]
-    genes_id = genes_id[:Ngen]
-elif(len(data) < Ngen):
-    lite_version = False
-    print("Warning: Imposible reduction, number of genes larger than databases.")
-    print("The Full version will be performe instead.")
+if(lite_version):
+    if(data.shape[1] > Ngen):
+        print("Lite version: reducing the number of genes by", Ngen)
+        data = data[:, :Ngen]
+        genes_id = genes_id[:Ngen]
+    elif(len(data) < Ngen):
+        lite_version = False
+        print("Warning: Imposible reduction, number of genes larger than databases.")
+        print("The Full version will be performe instead.")
 
 print("Computing PCA components...")
 eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data)
@@ -137,6 +137,7 @@ print("Done!")
 
 # Output data and figures --------------------------------------------------
 
+glabels=np.array([[' ',' ',' '],['index','gene ID\t','PC1']])
 print("Exporting data and plots...")
 np.savetxt(sample_id+'_pc_dat.dat', projection, fmt='%f')
 np.savetxt(sample_id+'_evec_dat.dat', eigenvectors.T, fmt='%f')
@@ -145,7 +146,7 @@ np.savetxt(sample_id+'_eval_dat.dat', eigenvalues, fmt='%f')
 np.savetxt(sample_id+'_evec-t_dat.dat', eigenvectors, fmt='%f')
 np.savetxt(sample_id+'_ind20_dat.dat', index, fmt='%i')
 np.savetxt(sample_id+'_pc20_dat.dat', components, fmt='%f')
-#np.savetxt(sample_id+'ngenes_dat.dat', np.transpose([index,genes_id[index],components]), delimiter="\t", fmt="%s")
+np.savetxt(sample_id+'ngenes_dat.dat', np.concatenate((glabels,np.transpose([index,genes_id[index],components]))), delimiter="\t", fmt="%s")
 
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
