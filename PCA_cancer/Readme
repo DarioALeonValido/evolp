@@ -28,7 +28,7 @@ is processed. In order to process other tissues, one can use the following ident
 "HNSC" - Head and Neck squamous cell carcinoma
 "READ" - Rectum adenocarcinoma
 
-Outputs of 'tcga.py' for lite version:
+Outputs of 'tcga.py':
 - a data file with the principal components of the data.
 - a data file with the normalized eigenvalues ​​arranged in 
 descending order.
@@ -47,6 +47,3 @@ to the tumor tissue.
 - a figure with the 20 more 
 significant components of the 
 first eigenvector.
-
-Outputs of 'tcga.py' for full version:
-- a file with the principal components of the data
