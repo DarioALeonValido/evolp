@@ -1,20 +1,17 @@
-The present directory corresponds to the work of Principal
-Component Analysis of the data downloaded of The Cancer Genome 
-Atlas(TCGA).
-
+The present directory corresponds to papers https://arxiv.org/abs/2003.07828
+and https://arxiv.org/abs/1706.09813v3, and describes results on Principal
+Component Analysis of the data downloaded from The Cancer Genome 
+Atlas portal (TCGA).
 
 There are two scripts: 'PCA_core.py' and 'tcga.py'.
 
 'PCA_core.py' contains a collection of routines for 
 Principal Component Analysis.
 
-'tcga.py' applies the PCA technique to TCGA data at 
-https://www.cancer.gov/tcga. In this script a lite version 
-can be selected to process only some genes of the data to 
-be able to test the subroutine with a low computational cost.
-By default the Kidney Renal Clear Cell Carcinoma (KIRC) data 
-is processed, to use with other tissues you can change the value
-of the tissue_id variable by one of the following identifiers:
+'tcga.py' applies the PCA technique to the TCGA data. In this script, a 
+lite version, with a reduced number of genes, enables testing the subroutine.
+By default, the Kidney Renal Clear Cell Carcinoma (KIRC) data 
+is processed. In order to process other tissues, one can use the following identifiers:
 "PRAD" - Prostate adenocarcinoma
 "KIRC" - Kidney renal clear cell carcinoma
 "LUSC" - Lung squamous cell carcinoma
@@ -40,14 +37,15 @@ order.
 - a data file with the eigenvectors, each row contains the 
 eigenvector corresponding to the eigenvalue of the same row 
 in the eigenvalue file.
-- 3 data files with information about 20 components more 
-significative of the first eigenvector.
-- a data file with the index of the samples correspondent 
+- 3 data files with information about the 20 more 
+significant components of the first eigenvector.
+- a data file with the index of the samples corresponding 
 to the normal tissue. 
-- a data file with the index of the samples correspondent
+- a data file with the index of the samples corresponding
 to the tumor tissue.
 - a figure with the two first principal components.
-- a figure with the 20 components more significative of the 
+- a figure with the 20 more 
+significant components of the 
 first eigenvector.
 
 Outputs of 'tcga.py' for full version:
