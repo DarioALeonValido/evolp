@@ -1,0 +1,36 @@
+The present directory corresponds to the work of principal
+component analys of the data downloaded of TCGA.
+
+
+There are two scripts: 'PCA_core.py' and 'tcga.py', for 
+TCGA data.
+
+'PCA_core.py' contains a collection of routines for 
+Principal Component Analysis.
+
+'tcga.py' applies the PCA technique to TCGA data at 
+https://www.cancer.gov/tcga. In this script a lite version 
+can be selected to process only some genes of the data to 
+be able to test the subroutine with a low computational cost.
+
+Outputs of 'tcga.py' for lite version:
+- a data file with the principal components of the data.
+- a data file with the normalized eigenvalues ​​arranged in 
+descending order.
+- a data file with the eigenvalues arranged in descending 
+order.
+- a data file with the eigenvectors, each row contains the 
+eigenvector corresponding to the eigenvalue of the same row 
+in the eigenvalue file.
+- 3 data files with information about 20 components more 
+significative of the first eigenvector.
+- a data file with the index of the samples correspondent 
+to the normal tissue. 
+- a data file with the index of the samples correspondent
+to the tumor tissue.
+- a figure with the two first principal components.
+- a figure with the 20 components more significative of the 
+first eigenvector.
+
+Outputs of 'tcga.py' for full version:
+- a file with the principal components of the data
