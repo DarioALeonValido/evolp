@@ -1,0 +1,13 @@
+The present directory corresponds to the work of principal
+component analys of the data downloaded of 
+http://myxo.css.msu.edu/ecoli/summdata.html
+
+
+There is a scripts: 'ecoli.py'.
+
+The script 'ecoli.py' applies the PCA technique to data at 
+../evolp/PCA_ecoli/
+
+
+Outputs of 'ecoli.py':
+- a file with the principal components of the data

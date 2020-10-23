@@ -1,0 +1,13 @@
+The present directory corresponds to the work of principal
+component analys of the data downloaded of Allen Institute 
+study of aging and dementia.
+
+
+There is a scripts: 'alzheimer.py'.
+
+The script 'alzheimer.py' applies the PCA technique to data at 
+../evolp/bases_external/Aging_Brain/
+
+
+Outputs of 'alzheimer.py':
+- a file with the principal components of the data
