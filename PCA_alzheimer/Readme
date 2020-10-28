@@ -1,13 +1,28 @@
-The present directory corresponds to the paper
-https://arxiv.org/abs/1706.09813v3 and describes 
-Principal Component Analysis of the expression data 
-downloaded from the Allen Institute 
-study on aging and dementia. It makes use of 
-the routine pca_core.py included in 
-the directory evolp/pca_cancer.
+The present directory corresponds to the paper arXiv:1706.09813 
+and describes the Principal Component Analysis of the expression 
+data related to the Alzheimer disease.
 
-The script 'alzheimer.py' applies the PCA technique to the data 
-contained in evolp/bases_external/Aging_Brain/
+The database was downloaded from the Allen Institute study on 
+aging and dementia, http://aging.brain-map.org/, and is 
+replicated in the folder 'evolp/bases_external/Aging_Brain/'. 
 
-Outputs of 'alzheimer.py':
+The script 'alzheimer.py' makes use of the routine pca_core.py 
+included in the directory 'evolp/pca_cancer/', and applies the 
+PCA technique to the specific "No Dementia" and "Alzheimer's 
+Disease Type" data that correspond to one of the following 
+measurement identifiers:
+FWM
+HIP
+PCx
+TCx
+
+A bool variable controls whether we would like to performe a 
+lite version with a reduced number of genes, for testing the 
+subroutine, or the full version with more than 50000 genes.
+
+Outputs of 'alzheimer.py'
 - a file with the principal components of the data
+- two files with the corresponding eigenvalues and aigenvectors
+- a file with a list of the main genes
+- a plot of PC1
+- a plot of PC1 vs. PC2 data analogous to Fig.4a in the paper

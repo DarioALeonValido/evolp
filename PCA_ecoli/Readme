@@ -1,12 +1,19 @@
-The present directory corresponds to the 
-paper https://arxiv.org/abs/1706.09813, and
-describes Principal Component Analysis of the 
-expression data downloaded from the web portal of
-the LTEE with E Coli, 
-http://myxo.css.msu.edu/ecoli/summdata.html
+The present directory corresponds to the paper arXiv:1706.09813
+and describes the Principal Component Analysis of the expression 
+data of ancestral and evolved E, Coli populations.
 
-The script 'ecoli.py' applies the PCA technique to data at 
-evolp/PCA_ecoli/
+The database was downloaded from the web portal of the Long Term
+Evolution Experiment with E. Coli, 
+http://myxo.css.msu.edu/ecoli/summdata.html, and is replicated
+in the folder 'evolp/PCA_ecoli/'.
+
+The script 'ecoli.py' makes use of the routine pca_core.py 
+included in the directory 'evolp/pca_cancer/', and applies the 
+PCA technique to the data.
 
 Outputs of 'ecoli.py':
 - a file with the principal components of the data
+- two files with the corresponding eigenvalues and aigenvectors
+- a file with a list of the main genes
+- a plot of PC1
+- a plot of PC1 vs. PC2 data analogous to Fig.2a in the paper
