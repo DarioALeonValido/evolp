@@ -2,15 +2,15 @@ The present directory corresponds to papers arXiv:2003.07828
 and arXiv:1706.09813, and describes results on Principal
 Component Analysis (PCA) of expression data related to human 
 cancers.
+
 The data come from The Cancer Genome Atlas (TCGA) portal,
-https://www.cancer.gov/tcga, and is should be replicated in 
+https://www.cancer.gov/tcga, and is replicated in 
 the folder 'evolp/databases_external/TCGA/', where we provide
 instructions to download it.
 
 The processing is made with two scripts: 'PCA_core.py' and
 'tcga.py'. The first one contains a collection of PCA 
-routines that are called from the other in order to apply the 
-technique to the specific TCGA data. 
+routines. The second one applies PCA_core.py to the specific TCGA data. 
 
 By default, the Kidney Renal Clear Cell Carcinoma (KIRC) data 
 is processed. In order to process other tissues, one can use 
@@ -31,7 +31,7 @@ BRCA - Breast invasive carcinoma
 HNSC - Head and Neck squamous cell carcinoma
 READ - Rectum adenocarcinoma
 
-A bool variable controls whether we would like to performe a 
+A bool variable controls whether we would like to perform a 
 lite version with a reduced number of genes, for testing the 
 subroutine, or the full version with more than 60000 genes.
 
