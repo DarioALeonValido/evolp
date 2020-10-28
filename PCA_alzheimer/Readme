@@ -1,0 +1,13 @@
+The present directory corresponds to the paper
+https://arxiv.org/abs/1706.09813v3 and describes 
+Principal Component Analysis of the expression data 
+downloaded from the Allen Institute 
+study on aging and dementia. It makes use of 
+the routine pca_core.py included in 
+the directory evolp/pca_cancer.
+
+The script 'alzheimer.py' applies the PCA technique to the data 
+contained in evolp/bases_external/Aging_Brain/
+
+Outputs of 'alzheimer.py':
+- a file with the principal components of the data

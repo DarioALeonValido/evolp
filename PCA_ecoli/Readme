@@ -1,0 +1,12 @@
+The present directory corresponds to the 
+paper https://arxiv.org/abs/1706.09813, and
+describes Principal Component Analysis of the 
+expression data downloaded from the web portal of
+the LTEE with E Coli, 
+http://myxo.css.msu.edu/ecoli/summdata.html
+
+The script 'ecoli.py' applies the PCA technique to data at 
+evolp/PCA_ecoli/
+
+Outputs of 'ecoli.py':
+- a file with the principal components of the data
