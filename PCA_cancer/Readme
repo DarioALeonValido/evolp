@@ -1,49 +1,56 @@
-The present directory corresponds to papers https://arxiv.org/abs/2003.07828
-and https://arxiv.org/abs/1706.09813v3, and describes results on Principal
-Component Analysis of the data downloaded from The Cancer Genome 
-Atlas portal (TCGA).
+The present directory corresponds to papers arXiv:2003.07828
+and arXiv:1706.09813, and describes results on Principal
+Component Analysis (PCA) of expression data related to human 
+cancers.
+The data come from The Cancer Genome Atlas (TCGA) portal,
+https://www.cancer.gov/tcga, and is should be replicated in 
+the folder 'evolp/databases_external/TCGA/', where we provide
+instructions to download it.
 
-There are two scripts: 'PCA_core.py' and 'tcga.py'.
+The processing is made with two scripts: 'PCA_core.py' and
+'tcga.py'. The first one contains a collection of PCA 
+routines that are called from the other in order to apply the 
+technique to the specific TCGA data. 
 
-'PCA_core.py' contains a collection of routines for 
-Principal Component Analysis.
-
-'tcga.py' applies the PCA technique to the TCGA data. In this script, a 
-lite version, with a reduced number of genes, enables testing the subroutine.
 By default, the Kidney Renal Clear Cell Carcinoma (KIRC) data 
-is processed. In order to process other tissues, one can use the following identifiers:
-"PRAD" - Prostate adenocarcinoma
-"KIRC" - Kidney renal clear cell carcinoma
-"LUSC" - Lung squamous cell carcinoma
-"LUAD" - Lung adenocarcinoma
-"UCEC" - Uterine Corpus Endometrial Carcinoma
-"KIRP" - Kidney renal papillary cell carcinoma
-"BLCA" - Bladder Urothelial Carcinoma
-"COAD" - Colon adenocarcinoma
-"ESCA" - Esophageal carcinoma
-"LIHC" - Liver hepatocellular carcinoma
-"STAD" - Stomach adenocarcinoma
-"THCA" - Thyroid carcinoma
-"BRCA" - Breast invasive carcinoma
-"HNSC" - Head and Neck squamous cell carcinoma
-"READ" - Rectum adenocarcinoma
+is processed. In order to process other tissues, one can use 
+the following identifiers:
+PRAD - Prostate adenocarcinoma
+KIRC - Kidney renal clear cell carcinoma
+LUSC - Lung squamous cell carcinoma
+LUAD - Lung adenocarcinoma
+UCEC - Uterine Corpus Endometrial Carcinoma
+KIRP - Kidney renal papillary cell carcinoma
+BLCA - Bladder Urothelial Carcinoma
+COAD - Colon adenocarcinoma
+ESCA - Esophageal carcinoma
+LIHC - Liver hepatocellular carcinoma
+STAD - Stomach adenocarcinoma
+THCA - Thyroid carcinoma
+BRCA - Breast invasive carcinoma
+HNSC - Head and Neck squamous cell carcinoma
+READ - Rectum adenocarcinoma
+
+A bool variable controls whether we would like to performe a 
+lite version with a reduced number of genes, for testing the 
+subroutine, or the full version with more than 60000 genes.
 
 Outputs of 'tcga.py':
 - a data file with the principal components of the data.
 - a data file with the normalized eigenvalues ​​arranged in 
-descending order.
+  descending order.
 - a data file with the eigenvalues arranged in descending 
-order.
+  order.
 - a data file with the eigenvectors, each row contains the 
-eigenvector corresponding to the eigenvalue of the same row 
-in the eigenvalue file.
-- 3 data files with information about the 20 more 
-significant components of the first eigenvector.
-- a data file with the index of the samples corresponding 
-to the normal tissue. 
-- a data file with the index of the samples corresponding
-to the tumor tissue.
+  eigenvector corresponding to the eigenvalue of the same row 
+  in the eigenvalue file.
+- 3 data files with information about the 20 more significant 
+  components of the first eigenvector.
+- a data file with the index of the samples corresponding to 
+  the normal tissue. 
+- a data file with the index of the samples corresponding to 
+  the tumor tissue.
 - a figure with the two first principal components.
-- a figure with the 20 more 
-significant components of the 
-first eigenvector.
+- a figure with the 20 more significant components of the 
+  first eigenvector.
+
