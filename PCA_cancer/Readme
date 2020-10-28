@@ -3,9 +3,9 @@ and arXiv:1706.09813, and describes results on Principal
 Component Analysis (PCA) of expression data related to human 
 cancers.
 The data come from The Cancer Genome Atlas (TCGA) portal,
-https://www.cancer.gov/tcga, and is should be replicated in 
-the folder 'evolp/databases_external/TCGA/', where we provide
-instructions to download it.
+https://www.cancer.gov/tcga, and it is meant to be 
+replicated in the folder 'evolp/databases_external/TCGA/', 
+where we provide instructions to download it.
 
 The processing is made with two scripts: 'PCA_core.py' and
 'tcga.py'. The first one contains a collection of PCA 
