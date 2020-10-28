@@ -138,14 +138,11 @@ print("Done!")
 # Output data and figures --------------------------------------------------
 
 print("Exporting data and plots...")
-np.savetxt(sample_id+'_pc_dat.dat', projection, fmt='%f')
-np.savetxt(sample_id+'_evec_dat.dat', eigenvectors.T, fmt='%f')
-np.savetxt(sample_id+'_eval-n_dat.dat', eigenvalues_normalized, fmt='%f')
-np.savetxt(sample_id+'_eval_dat.dat', eigenvalues, fmt='%f')
-np.savetxt(sample_id+'_evec-t_dat.dat', eigenvectors, fmt='%f')
-np.savetxt(sample_id+'_ind20_dat.dat', index, fmt='%i')
-np.savetxt(sample_id+'_pc20_dat.dat', components, fmt='%f')
-np.savetxt(sample_id+'ngenes_dat.dat', np.transpose([index,genes_id[index],components]),
+np.savetxt(sample_id+'_PCs_dat.dat', projection, fmt='%f')
+np.savetxt(sample_id+'_eigenvectors_dat.dat', eigenvectors.T, fmt='%f')
+np.savetxt(sample_id+'_eigenvalues_dat.dat', eigenvalues_normalized, fmt='%f')
+#np.savetxt(sample_id+'_eval_dat.dat', eigenvalues, fmt='%f')
+np.savetxt(sample_id+'_main-'+str(Npc)+'-genes_dat.dat', np.transpose([index,genes_id[index],components]),
 header='index\tgene ID\t\tPC1',comments='', delimiter="\t", fmt="%s")
 
 fig1, ax1 = plt.subplots()
