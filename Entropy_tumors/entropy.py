@@ -201,6 +201,8 @@ def _complexity_map(mean, covariance_matrix ,DIMENSION, EXCLUSION_LIST):
     ax.scatter(x3, y, label=r'$\Delta S=S_{tumor}-S_{normal}$')
     ax.scatter(x1, y, label=r'$S_{normal}$')
     ax.scatter(x2, y, label=r'$S_{tumor}$')
+    np.savetxt('entropy_dat.dat', np.transpose([z,x1,x2,x3,y]),
+    header='tissue\tSnormal\t\t\tStumor\t\t\tdeltaS\t\t\t-ln(I)',comments='', delimiter="\t", fmt="%s")
     
     for i, txt in enumerate(z):
         ax.annotate(txt, (x1[i], y[i]))
