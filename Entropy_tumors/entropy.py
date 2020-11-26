@@ -3,7 +3,7 @@ This script file computes the entropy and overlap of PCA.
 The procedure and main results are described in paper 
 arXiv:2005.02271
 For more details on this file see author(s):
-FQ, DALV
+FEQ, DALV
 """
 
 import numpy as np
@@ -173,8 +173,8 @@ if __name__ == "__main__":
     '\t\tstd(lnI)_Nn',comments='',delimiter=" \t",fmt="%s")
 
 
+    print('\nPloting figures')
 # plotting PC1 vs. PC2 ----------------------------
-    print('\nPloting PC1 vs. PC2')
     t_id='LUSC'
     pc_normal,pc_tumor=read_PC(sample_path,PC_path,t_id,2)
     plt.scatter(pc_normal[:,0],pc_normal[:,1],label='normal',c='b',s=15)
@@ -188,5 +188,37 @@ if __name__ == "__main__":
     plt.savefig('ge'+t_id+'_pc1-2_fig.pdf')
     plt.clf()
 
+
+# plotting -lnI vs. deltaS ----------------------------
+    fit=np.polyfit(S_normal,lnI_samp_mean,1)
+    f=np.poly1d(fit)
+    plt.errorbar(S_normal,lnI_samp_mean,yerr=lnI_samp_std,fmt='o',
+    capsize=5,label='normal',c='blue')
+    plt.errorbar(S_tumor_samp_mean,lnI_samp_mean,xerr=S_tumor_samp_std,yerr=lnI_samp_std,fmt='o',
+    capsize=5,label='tumor',c='red')
+    plt.plot([min(S_normal),max(S_normal)],f([min(S_normal),max(S_normal)]),c='blue',linestyle='dashed')
+    plt.axvline(x=np.mean(S_tumor_samp_mean),color='red',linestyle='dashed')
+    plt.xlabel('Sn,<St>')
+    plt.ylabel('-lnI')
+    plt.legend()
+    plt.tight_layout()
+    plt.legend(loc='upper center')
+    plt.savefig('entropies_map_fig.pdf')
+    plt.clf()
+
+    fit=np.polyfit(S_delta_samp,lnI_samp_mean,1)
+    f=np.poly1d(fit)
+    plt.errorbar(S_delta_samp,lnI_samp_mean,xerr=S_tumor_samp_std,yerr=lnI_samp_std,fmt='o',
+    capsize=5,label='Nn random samples',c='black')
+    plt.plot([min(S_delta_samp),max(S_delta_samp)],f([min(S_delta_samp),max(S_delta_samp)]),
+    c='red',linestyle='dashed')
+    for i in range(len(S_delta_samp)):
+        plt.annotate(tissues_id[i], (S_delta_samp[i], lnI_samp_mean[i]), ha='center')
+    plt.xlabel('<St>-Sn')
+    plt.ylabel('-lnI')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('entropy_samp_map_fig.pdf')
+    plt.clf()
 
 print("Done!")
