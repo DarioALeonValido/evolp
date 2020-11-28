@@ -121,7 +121,7 @@ if(lite_version):
     theta = np.linspace(0, 2*np.pi, 100)
 
 else:
-    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data,True)
+    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data,True,Npc)
 
 index = np.argpartition(-np.abs(eigenvectors[:, 0]), Npc)[:Npc]
 components = eigenvectors[index, 0]
@@ -162,6 +162,6 @@ if(lite_version):
     fig1.savefig(tissue_id+'_PC2_vs_PC1_fig.png')
     fig2.savefig(tissue_id + "_PC1_fig.png")
 else:
-    np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection, fmt='%f')
+    np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection)
 
 print("Done!")

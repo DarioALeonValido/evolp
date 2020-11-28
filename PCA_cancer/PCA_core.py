@@ -13,11 +13,11 @@ from scipy.linalg import eigh
 
 # Routines ------------------------------------------------------
 
-def PCA_core(data, sparse_data = False):
+def PCA_core(data, sparse_data=False, Npc=100):
 
     covariance = np.dot(data.T, data)/np.alen(data)
     if(sparse_data):
-        eigenvalues, eigenvectors = eigsh(covariance, k = 100)
+        eigenvalues, eigenvectors = eigsh(covariance, k = Npc)
     else:
         eigenvalues, eigenvectors = eigh(covariance)
     eigenvectors = eigenvectors[:, np.argsort(-np.abs(eigenvalues))]
