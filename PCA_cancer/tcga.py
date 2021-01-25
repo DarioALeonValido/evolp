@@ -162,6 +162,6 @@ if(lite_version):
     fig1.savefig(tissue_id+'_PC2_vs_PC1_fig.png')
     fig2.savefig(tissue_id + "_PC1_fig.png")
 else:
-    np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection)
+    np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection.T)
 
 print("Done!")
