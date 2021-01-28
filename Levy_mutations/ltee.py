@@ -195,7 +195,7 @@ marker='o'
 #linestyle='dashed'
 #)
 
-plt.xlabel('gen') 
+plt.xlabel('generations') 
 plt.ylabel('Number of SPMs')
 plt.tight_layout()
 plt.legend()
@@ -226,7 +226,7 @@ marker='o'
 #, markerfacecolor='yellow', markersize=12
 )
 
-plt.xlabel('gen') 
+plt.xlabel('generations') 
 plt.ylabel('Number of SPMs')
 plt.tight_layout()
 plt.legend()
@@ -245,7 +245,7 @@ marker='o'
 #, markerfacecolor='blue', markersize=12
 )  
 
-plt.xlabel('gen') 
+plt.xlabel('generations') 
 plt.ylabel('Number of Rearrangements')
 plt.tight_layout()
 plt.legend()
@@ -280,4 +280,42 @@ plt.ylabel('Cumulative Probability of Large Rearrangements')
 plt.tight_layout()
 plt.legend(loc='upper right')
 plt.savefig(plot_id+'mut-LR_distribution_fig.pdf')
+plt.clf()
+
+
+# plotting SPM and LR ----------------------------
+
+plt.plot(genF[0:5], mutF[0:5], 
+label = "SNPs fixed",
+color=colors[2],
+linestyle='dashed', 
+#linewidth = 3, 
+marker='o' 
+#, markerfacecolor='blue', markersize=12
+)  
+
+plt.plot(genF[0:5], mutT[0:5], 
+label = "total SNPs",
+color=colors[11], 
+#linestyle='dashed', 
+#linewidth = 3, 
+marker='o' 
+#, markerfacecolor='yellow', markersize=12
+)
+
+plt.plot(genLR, numLR, 
+label = "large rearrangements",
+color=colors[1],
+linestyle='dashed', 
+#linewidth = 3, 
+marker='o' 
+#, markerfacecolor='blue', markersize=12
+)  
+
+plt.xlabel('generations') 
+plt.ylabel('Number of Mutations')
+plt.tight_layout()
+plt.legend()
+plt.savefig(plot_id+'mut-SNP&LR_fig.pdf')
+
 
