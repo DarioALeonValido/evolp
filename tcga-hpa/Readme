@@ -2,14 +2,18 @@ This directory corresponds to the Principal Component Analysis (PCA)
 of gene expression data that come from The Cancer Genome Atlas (TCGA)
 and Human Protein Atlas (HPA).
 
-There are two python script 'tcga.py', for TCGA data, and 'hpa.py',
-for HPA data.
+There are three python script 'tcga.py', for TCGA data; 'hpa.py',
+for HPA data; and 'PCA_core_mem.py' that contains a PCA routine.
 
 'tcga.py' reads TCGA data found in the 'databases_generated/tcga-hpa/'
 directory at the repository root and applies the PCA technique.
 
 'hpa.py' reads HPA data found in the 'databases_external/tcga-hpa/'
 directory at the repository root and applies the PCA technique.
+
+'PCA_core_mem.py' contains routine of PCA that makes use of the Lanczos
+algorithm to avoid exceeding the maximum capacity of memory RAM using the
+disk storage.
 
 Output of 'tcga.py':
 - a figure corresponding to a three-dimensional graph of the TCGA data

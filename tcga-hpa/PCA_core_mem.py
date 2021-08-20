@@ -1,7 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+A Principal Component Analysis (PCA) technique with low RAM requirements.
+
+@author: JANC
+"""
+
 import numpy as np
 from scipy.linalg import eigh
-from os.path import isfile, isdir
-from os import mkdir
+from os.path import isfile
 
 # Covariance Matrix
 # =================
@@ -110,7 +116,7 @@ def check(vec: np.ndarray, w: np.ndarray, i: int, lim: float = -1) -> tuple:
         A list with two elements, the first a boolean that is true if the
         vector is orthogonal with the set of vectors under some approximation
         and the second is a float that indicates the value of the dot product
-        between the vector ``w`` and a vector of the vectors of the set 
+        between the vector ``w`` and a vector of the vectors of the set
         ``vec``.
     """
     for j in range(1, i + 2):
@@ -154,9 +160,9 @@ def ortogonalize(vec: np.ndarray, w: np.ndarray,
         q = np.random.randn(dim)
         for j in range(i + 2):
             q = q - np.dot(q, vec[j]) * vec[j]
-        
+
         _, buff = check(vec, q, i)
-        
+
         n += 1
         if n == 100:
             print('Something went wrong')
@@ -202,7 +208,6 @@ def lanczos(iter: int, dim: int,
         QOrtonormal, valor = check(vec, w, i)
         if not QOrtonormal:
             w = ortogonalize(vec, w, i, valor, dim)
-            
 
         beta[i + 1] = np.linalg.norm(w)
         vec[i + 2] = w/beta[i + 1]

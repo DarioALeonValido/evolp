@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-The script file applies a Principal Component Analysis (PCA) technique to the 
+The script file applies a Principal Component Analysis (PCA) technique to the
 gene expression data that come from The Cancer Genome Atlas (TCGA),
-https://www.cancer.gov/tcga.
+https://www.cancer.gov/tcga/.
 
 For more details on this file see author(s).
 
@@ -17,48 +17,45 @@ from os.path import isdir
 from pathlib import Path
 from scipy.stats import gmean
 from PCA_core import PCA_core as PCA
-#from PCA_core_mem import PCAL as PCA   # Principal Component decomposition 
+# from PCA_core_mem import PCAL as PCA  # Principal Component decomposition
                                         # routine with memory boundaries
 
 
 datapath = Path("../databases_generated/tcga-hpa/meanvalues/")
 
 if not isdir(datapath):
-    print('You must first unzip the "meanvalues.tar.xy" file, which are located\
- in the "databases_generated/tcga-hpa/" directory, before running this script')
+    print('You must first unzip the "meanvalues.tar.xy" file, which are\
+ located in the "databases_generated/tcga-hpa/" directory, before\
+ running this script')
     exit()
 
-fname_tcga = []
-for root, dirs, files in walk(datapath):
-    for file in files:
-        fname_tcga.append(file)
-
+# Reading the tcga data
 normal = []
 tumor = []
-for fname in fname_tcga:
-    if fname.startswith('normal'):
-        normal.append(np.loadtxt(datapath / fname))
-    else:
-        tumor.append(np.loadtxt(datapath / fname))
+for root, dirs, files in walk(datapath):
+    for file in files:
+        if file.startswith('normal'):
+            normal.append(np.loadtxt(datapath / file))
+        elif file.startswith('tumor'):
+            tumor.append(np.loadtxt(datapath / file))
 normal = np.array(normal)
 tumor = np.array(tumor)
 
+# Calculating reference values, normalizing and applying logarithm to the data 
 ref = gmean(normal)
 data = np.concatenate((normal, tumor))/ref
 data = np.log2(data)
+
 n = normal.shape[0]
 del normal, tumor, ref
 
-eigenvalues, eigenvectors, eigenvalues_normalized, projection = PCAL(
+# Applying the PCA technique to the data
+eigenvalues, eigenvectors, eigenvalues_normalized, projection = PCA(
     data, 20, matrix_fname='tri_tcga_5000_dat.npy', buffer_size=4000)
 
-np.savetxt('eigenvalues_dat.dat', eigenvalues)
-np.savetxt('eigenvectors_dat.dat', eigenvectors)
-np.savetxt('eigenvalues_normalized_dat.dat', eigenvalues_normalized)
-np.savetxt('projection_dat.dat', projection)
-
+# Getting the top panel of Fig. 1
 fig = plt.figure()
-ax = Axes3D(fig)
+ax = fig.add_subplot(projection='3d')
 
 ax.scatter(-projection[0, :n], -projection[1, :n], projection[2, :n],
            label='Normal')
