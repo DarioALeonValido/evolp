@@ -14,12 +14,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from PCA_core import PCA_core as PCA
-# from PCA_core_mem import PCAL as PCA  # Principal Component decomposition
+#from PCA_core import PCA_core as PCA
+from PCA_core_mem import PCAL as PCA  # Principal Component decomposition
                                         # routine with memory boundaries
 
 
-datapath = Path("../databases_external/tcga-hpa/")
+datapath = Path("../databases_external/HPA/")
 fname_normal = Path('normal_tissue.tsv.zip')
 fname_tumor = Path('pathology.tsv.zip')
 

@@ -8,7 +8,7 @@ for HPA data; and 'PCA_core_mem.py' that contains a PCA routine.
 'tcga.py' reads TCGA data found in the 'databases_generated/tcga-hpa/'
 directory at the repository root and applies the PCA technique.
 
-'hpa.py' reads HPA data found in the 'databases_external/tcga-hpa/'
+'hpa.py' reads HPA data found in the 'databases_external/PCA/'
 directory at the repository root and applies the PCA technique.
 
 'PCA_core_mem.py' contains routine of PCA that makes use of the Lanczos

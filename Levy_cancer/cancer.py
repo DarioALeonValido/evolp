@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 # General variables -----------------------------------------------
 
 Npc = 2
+initpc = 1
 lifetime=80
 tissue_id = 'COAD'
 tissues_PCA = ['BRCA','COAD','ESCA','HNSC','LIHC','LUAD','PRAD','THCA']
@@ -84,7 +85,7 @@ def read_CLRr(wb_name):
   
     return(name,risk,error)
           
-def read_PC(sample_path,PC_path,tissue_id,Npc):
+def read_PC(sample_path,PC_path,tissue_id,initpc,Npc):
     ind_normal = []
     ind_tumor = []
     pc_data = []
@@ -99,7 +100,7 @@ def read_PC(sample_path,PC_path,tissue_id,Npc):
         else:
             ind_tumor.append(i)
         pc_data.append([])
-        for j in range(Npc):    
+        for j in range(initpc-1,initpc-1+Npc):    
             pc_data[i].append(pc_ws.cell_value(i,j))
 
     pc_data = np.array(pc_data, dtype="f")
@@ -117,13 +118,13 @@ def fitness_dist(pc1,ind_n,ind_t,fitN,fitT,binsN,binsT):
     return pc,mfitness
 
 
-def compute_GEdistances(sample_path,PC_path,tissues):
+def compute_GEdistances(sample_path,PC_path,tissues,ipc):
     Xt = []
     Rn = []
     Rt = []
     #D = []
     for t_id in tissues:
-        pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,t_id,1)
+        pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,t_id,ipc,1)
         Xn = np.mean(pc_data[ind_normal])
         Rn.append(np.std(pc_data[ind_normal],ddof=1))
         Xt.append(abs(np.mean(pc_data[ind_tumor]) - Xn))
@@ -140,7 +141,7 @@ def compute_GEdistances(sample_path,PC_path,tissues):
 D = read_D(D_file)
 print("Loading lifetime variables for tissues:")
 nameCLRm,risk_m,Nsc,msc = read_CLRm(CLR_path+CLRm_file)
-print("Done!\nLoading cancer risks for tissues:")
+print("Done!\n\nLoading cancer risks for tissues:")
 nameCLRr,risk_r,error_r = read_CLRr(CLR_path+CLRr_file)
 t0 = np.log2(Nsc)
 t_r = t0 + msc*lifetime #total number of stem cell divisions
@@ -149,10 +150,10 @@ risk_m = risk_m/Nsc     #risk per stem cell
 aref = 2e-14            #reference value
 ERS = risk_m/(aref*t_m) #extra risk score
 
-print("Done!\nLoading Principal Componets for:") #working with PCA data
-pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue_id,Npc)
+print("Done!\n\nLoading Principal Componets for:") #working with PCA data
+pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue_id,initpc,Npc)
 pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
-Xt,Rn,Rt = compute_GEdistances(sample_path,PC_path,tissues_PCA)
+Xt,Rn,Rt = compute_GEdistances(sample_path,PC_path,tissues_PCA,initpc) # some plots do not work with i = 2, 3, ...
 R=Xt-(Rt+Rn)
 
 indexes_m= []
@@ -278,4 +279,5 @@ plt.tight_layout()
 plt.legend(loc=4)
 plt.savefig('risk-levy_fig.pdf')
 
-print("Done!")
+print("Done!\n")
+print("Check out the outputs!\n")
