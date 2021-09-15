@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 
 # General variables -----------------------------------------------
 
-Npc = 2
+NpcP = 2
+NpcV = 18
 initpc = 1
 tissue_id = 'KIRP'
 tissues_examples = ['KIRP','LIHC','LUSC']
@@ -79,6 +80,26 @@ def compute_GEdistances(sample_path,PC_path,tissues,ipc):
     return Xt,Rn,Rt#,D
 
 
+def compute_cum_variance(sample_path,PC_path,tissue,Npc):
+    CV  = []
+    CVn = []
+    CVt = []
+    pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue,1,1)
+    CVn.append(np.std(pc_data[ind_normal],ddof=1))
+    CVt.append(np.std(pc_data[ind_tumor],ddof=1))
+    CV.append(np.std(pc_data,ddof=1))
+    for i in range(1,Npc):
+        pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue,i,1)
+        CVn.append(CVn[-1] + np.std(pc_data[ind_normal],ddof=1))
+        CVt.append(CVt[-1] + np.std(pc_data[ind_tumor],ddof=1))
+        CV.append(CV[-1] + np.std(pc_data,ddof=1)) 
+    CV  = np.array(CV, dtype="f")      
+    CVn = np.array(CVn, dtype="f")   
+    CVt = np.array(CVt, dtype="f")   
+
+    return CV,CVn,CVt
+
+
 # Reading and processing all the data ---------------------------------------
 
 print("\nLoading Principal Componets for:") #working with PCA data
@@ -105,14 +126,17 @@ with open('geData_dat.dat','w+') as savefile:
   
 # plotting PC1 vs. PC2 ----------------------------
 for tissue in tissues_examples:
-    pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue,initpc,Npc)
-    pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
+    pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue,initpc,NpcP)
+    CV,CVn,CVt = compute_cum_variance(sample_path,PC_path,tissue,NpcV)
+    print(CVn)
     if (tissue=='KIRP'):
         plt.scatter(-pc_data[ind_normal,0],pc_data[ind_normal,1],label='normal',c='b',s=15)
         plt.scatter(-pc_data[ind_tumor,0],pc_data[ind_tumor,1],label='tumor',c='r',s=15)
+        pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
     else:
-        plt.scatter(pc_data[ind_normal,0],pc_data[ind_normal,1],label='normal',c='b',s=15)
-        plt.scatter(pc_data[ind_tumor,0],pc_data[ind_tumor,1],label='tumor',c='r',s=15)
+        plt.scatter(pc_data[ind_normal,0],-pc_data[ind_normal,1],label='normal',c='b',s=15)
+        plt.scatter(pc_data[ind_tumor,0],-pc_data[ind_tumor,1],label='tumor',c='r',s=15)
+        pc,mfitness = fitness_dist(pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
     plt.xlabel('PC1')
     plt.ylabel('PC2')
     plt.title(tissue)
