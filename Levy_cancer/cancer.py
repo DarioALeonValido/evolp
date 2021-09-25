@@ -150,7 +150,7 @@ risk_m = risk_m/Nsc     #risk per stem cell
 aref = 2e-14            #reference value
 ERS = risk_m/(aref*t_m) #extra risk score
 
-print("Done!\n\nLoading Principal Componets for:") #working with PCA data
+print("Done!\n\nLoading TCGA Principal Componets for:") #working with PCA data
 pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue_id,initpc,Npc)
 pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
 Xt,Rn,Rt = compute_GEdistances(sample_path,PC_path,tissues_PCA,initpc) # some plots do not work with i = 2, 3, ...

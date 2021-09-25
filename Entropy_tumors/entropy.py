@@ -108,11 +108,12 @@ if __name__ == "__main__":
     S_tumor_samp_min_mean,S_tumor_samp_min_std,S_delta_samp_min=[],[],[]
     lnI_samp_mean,lnI_samp_std,lnI_samp_min_mean,lnI_samp_min_std=[],[],[],[]
     Nn_min=23
+    print('\nLoading TCGA Principal Components\n')
     for t_id in tissues_id: 
         pc_normal,pc_tumor=read_PC(sample_path,PC_path,t_id,Npc)
         N_normal.append(len(pc_normal))
         N_tumor.append(len(pc_tumor))
-        print('normal/tumor:',len(pc_normal),len(pc_tumor))
+        print('normal/tumor:',len(pc_normal),'/',len(pc_tumor))
         print('PCs:',str(len(pc_normal[0]))+'x'+str(len(pc_tumor[0])))
 
         Sn_i,St_i,lnI_i=[],[],[]
@@ -221,4 +222,5 @@ if __name__ == "__main__":
     plt.savefig('entropy_samp_map_fig.pdf')
     plt.clf()
 
-print("Done!")
+print("Done!\n")
+print("Check out the outputs!\n")
