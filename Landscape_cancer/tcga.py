@@ -91,7 +91,7 @@ def read_data(datapath,tissue_id):
 
 # Reading and processing the data ------------------------------------------
 
-print("Reading files from databases:")
+print("Reading files from "+tissue_id+" databases:")
 if(not isfile(datapath+"sample"+tissue_id+".xls")):
     print(tissue_id, "databases not found, please read", "'"+ datapath + "info.txt'")
     sys.exit()
@@ -125,7 +125,7 @@ else:
     eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data,True,Npc)
 
 index = np.argpartition(-np.abs(eigenvectors[:, 0]), Npc)[:Npc]
-components = eigenvectors[index, 0]
+PC1 = eigenvectors[index, 0]
 print("Done!")
 
 
@@ -133,34 +133,52 @@ print("Done!")
 
 print("Exporting data and plots...")
 if(lite_version):
-    #np.savetxt('pc'+tissue_id+'_dat.dat', projection, fmt='%f')
+    #np.savetxt('pc'+tissue_id+'_dat.dat', projection.T, fmt='%f')
     #np.savetxt('evec'+tissue_id+'_dat.dat', eigenvectors.T, fmt='%f')
     #np.savetxt('eval-n'+tissue_id+'_dat.dat', eigenvalues_normalized, fmt='%f')
-    #np.savetxt('eval'+tissue_id+'_dat.dat', eigenvalues, fmt='%f')
-    np.savetxt('evec-t'+tissue_id+'_dat.dat', eigenvectors, fmt='%f')
-    np.savetxt('ind20'+tissue_id+'_dat.dat', index, fmt='%i')
-    np.savetxt('pc20'+tissue_id+'_dat.dat', components, fmt='%f')
-    np.savetxt('ngenes_dat.dat', np.transpose([index,genes_id[index],components]), delimiter="\t", fmt="%s")
-    np.savetxt('ind-normal'+tissue_id+'_dat.dat', normal, fmt='%i')
-    np.savetxt('ind-tumor'+tissue_id+'_dat.dat', tumor, fmt='%i')
+    #np.savetxt('evec-t'+tissue_id+'_dat.dat', eigenvectors, fmt='%f')
+    #np.savetxt('ind20'+tissue_id+'_dat.dat', index, fmt='%i')
+    np.savetxt(tissue_id+'genesPC1_dat.dat', np.transpose([index,genes_id[index],PC1]), 
+    delimiter="\t\t", fmt="%s", header='index\tgene ID\t\t\tPC1')
 
-    fig1, ax1 = plt.subplots()
+    fig1, ax1 = plt.subplots(1,2)
     fig2, ax2 = plt.subplots()
+    f=0.95
+    fig1.set_size_inches(f*2*4, f*1*3)
+    plt.rcParams['lines.linewidth'] = 1.0
+    plt.rcParams['axes.labelsize'] = 15
+    plt.rcParams['xtick.labelsize'] = 15
+    plt.rcParams['ytick.labelsize'] = 15
+    textF='large'
+    colors = ['royalblue','r','tab:orange','forestgreen','k']
+    al=0.7
+    size=18
+    xmin=-6;xmax=35
+    ymin=-21;ymax=45
     
-    ax1.scatter(projection[0,normal], -projection[1,normal], c='b',s=15,label="Normal")
-    ax1.scatter(projection[0,tumor], -projection[1,tumor], c='r',s=15,label="Tumor")
-    ax1.plot(center_pc1_normal+radius_pc1_normal*np.cos(theta),center_pc2_normal+radius_pc2_normal*np.sin(theta),alpha=0.7)
-    ax1.plot(center_pc1_tumor+radius_pc1_tumor*np.cos(theta),center_pc2_tumor+radius_pc2_tumor*np.sin(theta),alpha=0.7)
-       
-    for i in index:
-        ax2.plot([i,i],[0, eigenvectors[i,0]], color='k')
+    ax1[0].plot([xmin,xmax],[0, 0],c='gray',linestyle='--')
+    ax1[0].plot([0, 0],[ymin,ymax],c=colors[0])
+    ax1[0].plot([center_pc1_tumor, center_pc1_tumor],[ymin,ymax],c=colors[2])
+    ax1[0].scatter(projection[0,normal], -projection[1,normal],s=size,label=tissue_id+', normal', marker="o",c='b',alpha=al)
+    ax1[0].scatter(projection[0,tumor], -projection[1,tumor],s=size,label=tissue_id+', tumor', marker="s",c='r',alpha=al)
+    ax1[0].plot(center_pc1_normal+radius_pc1_normal*np.cos(theta),center_pc2_normal+radius_pc2_normal*np.sin(theta),c=colors[0])
+    ax1[0].plot(center_pc1_tumor+radius_pc1_tumor*np.cos(theta),center_pc2_tumor+radius_pc2_tumor*np.sin(theta),c=colors[2])
+    ax1[1].plot(range(1,len(eigenvalues_normalized)+1),100*np.cumsum(eigenvalues_normalized), marker="o",c='b',markersize=5)
+    ax1[1].text(3, 25, tissue_id, size=textF)
 
-    ax1.set_title(tissue_id), ax1.grid(), ax1.set_xlabel('PC1'), ax1.set_ylabel('-PC2'), ax1.legend()
-    ax2.set_title(tissue_id), ax2.grid(), ax2.set_xlabel('Genes'), ax2.set_ylabel('PC1')
-    fig1.tight_layout() 
+    ax1[0].set_xlabel('PC1'), ax1[0].set_ylabel('-PC2'), ax1[0].legend(edgecolor='k', borderaxespad=0.2)
+    ax1[0].locator_params(axis='x',nbins=6),ax1[0].locator_params(axis='y',nbins=6), ax1[0].set_xlim(xmin,xmax), ax1[0].set_ylim(ymin,ymax)
+    ax1[1].set_xlabel('Number of components'), ax1[1].set_ylabel('Cumulative variance (%)')
+    ax1[1].set_xlim(0.,Npc+0.2), ax1[1].set_ylim(0,102), ax1[1].locator_params(axis='x',nbins=5),  
+    fig1.tight_layout()
+     
+    for i in index:
+        ax2.plot([i,i],[0, eigenvectors[i,0]], color='b')
+
+    ax2.set_title(tissue_id), ax2.grid(), ax2.set_xlabel('Genes'), ax2.set_ylabel('PC1') 
     fig2.tight_layout() 
       
-    fig1.savefig(tissue_id+'_PC2_vs_PC1_fig.png')
+    fig1.savefig(tissue_id+'_PC2_vs_PC1_fig.pdf')
     fig2.savefig(tissue_id + "_PC1_fig.png")
 else:
     np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection.T)
