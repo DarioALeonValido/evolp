@@ -11,6 +11,7 @@ JANC, DALV
 """
 
 import numpy as np
+# sys.path.insert(0,'../../xlrd/')   # for cluster lyra
 import xlrd as xl
 from scipy.stats.mstats import gmean
 import matplotlib.pyplot as plt
