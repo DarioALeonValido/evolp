@@ -91,7 +91,7 @@ def MultMV(vec: np.ndarray, matrix_fname: str) -> np.ndarray:
     return(r)
 
 
-# Lanzos
+# Lanczos
 # ======
 
 
