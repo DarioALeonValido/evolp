@@ -16,12 +16,12 @@ from os import walk
 from os.path import isdir
 from pathlib import Path
 from scipy.stats import gmean
-from PCA_core import PCA_core as PCA
-# from PCA_core_mem import PCAL as PCA  # Principal Component decomposition
-                                        # routine with memory boundaries
+#from PCA_core import PCA_core as PCA
+from PCA_core_mem import PCAL as PCA  # Principal Component decomposition
+                                      # routine with memory boundaries
 
 
-datapath = Path("../databases_generated/tcga-hpa/meanvalues/")
+datapath = Path("../databases_generated/TCGA_exp/meanvalues/")
 
 if not isdir(datapath):
     print('You must first unzip the "meanvalues.tar.xy" file, which are\
@@ -66,6 +66,24 @@ ax.set_xlabel('- PC1')
 ax.set_ylabel('- PC2')
 ax.set_zlabel('PC3')
 ax.view_init(18, -76)
-fig.savefig('Fig1_fig.png')
+#fig.savefig('Fig1_fig.png')
 fig.savefig('Fig1_fig.pdf')
-plt.show()
+#plt.show()
+
+#Dario
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.scatter(projection[0, :n], -projection[2, :n],
+           label='Normal',c='b', alpha=0.7)
+ax2.scatter(projection[0, n:], -projection[2, n:],
+           label='Tumor',c='r', marker="s", alpha=0.7)
+#for i in range(n):
+    #ax2.annotate('tissT', projection[0, i], -projection[2, i])
+    #ax2.annotate('tissT', projection[0, -i], -projection[2, -i])
+
+ax2.legend()
+ax2.set_xlabel('PC1')
+ax2.set_ylabel('PC3')
+plt.tight_layout()
+fig2.savefig('Fig2_fig.pdf')
+
