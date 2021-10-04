@@ -25,9 +25,9 @@ from os.path import *
 # General variables ------------------------------------------------------
 
 lite_version = True
-Ngen = 1000 #60483
+Ngen = 2000 #60483
 NgenS = 20 #must be smaller or equal to Npc
-Npc = 30; NpcL = 100 #the maximum possible number of PCs is the number of genes
+Npc = 30; NpcL = 10 #the maximum possible number of PCs is the number of genes
 tissue_id = "KIRC"
 #possible targets:
 #tissue_id=["PRAD", "KIRC", "LUSC", "LUAD", "UCEC", "KIRP", "BLCA", "COAD", 
@@ -115,7 +115,7 @@ print("tumor =", len(tumor))
 print("total =", len(data))
 
 # reducing the data by Ngen genes for Lite version
-if(lite_version and data.shape[1] > Ngen):
+if(lite_version and data.shape[1] >= Ngen):
     print("Lite version: reducing the number of genes by", Ngen)
     data = data[:, :Ngen]
     genes_id = genes_id[:Ngen]
@@ -126,7 +126,7 @@ elif(len(data) < Ngen):
 
 print("Computing PCA components...")
 if(lite_version):
-    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data)
+    eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca.PCA_core(data,False,NpcL)
     #eigenvalues,eigenvectors,eigenvalues_normalized,projection = pca_mem.PCAL(data,NpcL, matrix_fname='tri_tcga_8000_dat.npy', buffer_size=8000)
 
     radius_pc1_normal, center_pc1_normal = pca.region(projection[0,normal])
@@ -153,7 +153,8 @@ if(lite_version):
     #np.savetxt('evec-t'+tissue_id+'_dat.dat', eigenvectors, fmt='%f')
     #np.savetxt('ind20'+tissue_id+'_dat.dat', index, fmt='%i')
     np.savetxt(tissue_id+'geneID-PC1_dat.dat', np.transpose([index,genes_id[index],PC1]), 
-    delimiter="\t\t", fmt="%s", header='index\tgene ID\t\t\tPC1')
+    delimiter="\t\t", fmt="%s", header='index\tgene ID\t\t\tAmplitude')
+
 
    #Fig.1
     fig1, ax1 = plt.subplots(1,2)
@@ -187,7 +188,12 @@ if(lite_version):
     fig1.tight_layout()
 
    #Fig.2
-    fig2, ax2 = plt.subplots(1,3)  
+    fig2 = plt.figure()
+    ax2 = []
+    ax2.append(fig2.add_subplot(1, 3, 1))
+    ax2.append(fig2.add_subplot(1, 3, 2))
+    ax2.append(fig2.add_subplot(1, 3, 3, sharey = ax2[1]))
+    #fig2, ax2 = plt.subplots(1,3)  
     f=0.99 
     fig2.set_size_inches(f*3*4, f*1*3) 
     plt.rcParams['lines.linewidth'] = 1.5
@@ -209,13 +215,17 @@ if(lite_version):
     ax2[0].set_xlabel('Gene number ('+r'$\times$1000)'), ax2[0].set_ylabel('Amplitude') 
     ax2[1].set_xlabel('Gene expression'), ax2[1].set_ylabel('Number of genes'), ax2[2].set_xlabel('Gene expression')
     ax2[0].set_xlim(0.,(Ngen+0.5)/1000.)#,ax2[1].set_xlim(0.5*10**-4,1.5)
-    ax2[0].locator_params(axis='x',nbins=6),ax2[1].set_xticks([10**-4, 10**-3, 10**-2,10**-1,1]),ax2[2].set_xticks([1, 10, 10**2,10**3])
+    ax2[0].locator_params(axis='x',nbins=6),ax2[1].set_xticks([10**-4, 10**-3, 10**-2,10**-1,1]),ax2[2].set_xticks([1, 10, 10**2,10**3,10**4])
     ax2[1].grid(which='major', ls='-'); ax2[2].grid(which='major', ls='-')
     ax2[1].grid(which='minor', ls='--'); ax2[2].grid(which='minor', ls='--')
     fig2.tight_layout() 
       
     fig1.savefig(tissue_id+'_PC1-2_fig.pdf')
     fig2.savefig(tissue_id + "_gene-dist_fig.pdf")
+    np.savetxt(tissue_id+'gene-under_dat.dat', np.transpose([refTu[:Ng_maxU],range(1,Ng_maxU+1)]), 
+    delimiter="\t\t", fmt="%s", header='under-expression\t\tNumber of genes')
+    np.savetxt(tissue_id+'gene-over_dat.dat', np.transpose([refTu[:Ng_maxO],range(1,Ng_maxO+1)]), 
+    delimiter="\t\t", fmt="%s", header='over-expression\t\tNumber of genes')
 else:
     np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection.T)
 
