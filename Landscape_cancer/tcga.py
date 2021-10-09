@@ -15,6 +15,7 @@ import numpy as np
 import xlrd as xl
 from scipy.stats.mstats import gmean
 import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
 import sys
 sys.path.append(r'../')
 from PCA_cancer import PCA_core as pca
@@ -25,7 +26,7 @@ from os.path import *
 # General variables ------------------------------------------------------
 
 lite_version = True
-Ngen = 2000 #60483
+Ngen = 1000 #60483
 NgenS = 20 #must be smaller or equal to Npc
 Npc = 30; NpcL = 10 #the maximum possible number of PCs is the number of genes
 tissue_id = "KIRC"
@@ -40,9 +41,9 @@ outputpath = "../databases_generated/TCGA_pca/"  # for Full databases
 # Functions ------------------------------------------------------
 
 def read_GEdata(datapath,tissue_id):
-    wb = xl.open_workbook(datapath+"sample"+tissue_id+".xls")
-    ws = wb.sheet_by_index(0)
-    print(ws.nrows,"individual files were identified.")
+    wb_s = xl.open_workbook(datapath+"sample"+tissue_id+".xls")
+    ws_s = wb_s.sheet_by_index(0)
+    print(ws_s.nrows,"individual files were identified.")
 
     sample_type = []
     normal = []
@@ -51,8 +52,8 @@ def read_GEdata(datapath,tissue_id):
     genes_id = []
 
     #reading first file to evaluate the cost
-    name = ws.cell_value(1,0)
-    sample_type.append(ws.cell_value(1,3))
+    name = ws_s.cell_value(1,0)
+    sample_type.append(ws_s.cell_value(1,3))
     if(not isfile(datapath+"data"+tissue_id+"/"+name)):
         print(tissue_id, "databases not found, please read", "'"+ datapath + "info.txt'")
         sys.exit()
@@ -60,7 +61,7 @@ def read_GEdata(datapath,tissue_id):
     lines = file_object.readlines()
     print("Each file contains",len(lines),"genes.")
     print("Loading large databases...")
-    if(ws.cell_value(1,3) == 'Solid Tissue Normal'):
+    if(ws_s.cell_value(1,3) == 'Solid Tissue Normal'):
         normal.append(0)
     else:
         tumor.append(0)
@@ -68,22 +69,22 @@ def read_GEdata(datapath,tissue_id):
     for line in lines:
         GEdata[-1].append(line.split()[1])
         genes_id.append(line.split()[0].split(sep=".")[0])
-    file_object.close()
 
     #reading the rest of the files
-    for i in range(2, ws.nrows):
-        name = ws.cell_value(i,0)
-        sample_type.append(ws.cell_value(i,3))
+    for i in range(2, ws_s.nrows):
+        name = ws_s.cell_value(i,0)
+        sample_type.append(ws_s.cell_value(i,3))
         file_object = open(datapath+"data"+tissue_id+"/"+name, "r")
         lines = file_object.readlines()
-        if(ws.cell_value(i,3) == 'Solid Tissue Normal'):
+        if(ws_s.cell_value(i,3) == 'Solid Tissue Normal'):
             normal.append(i-1)
         else:
             tumor.append(i-1)
         GEdata.append([])
         for line in lines:
             GEdata[-1].append(line.split()[1])
-        file_object.close()
+    wb_s.release_resources()
+    del wb_s
 
     GEdata = np.array(GEdata, dtype="f") + 0.1
     ref = gmean(GEdata[normal])
@@ -102,13 +103,48 @@ def read_GEdata(datapath,tissue_id):
     return([GEdata, refTu, refTo, normal, tumor, np.array(genes_id)])
 
 
+def read_index(ID, datapath,tissue_id):
+    wb_s = xl.open_workbook(datapath+"sample"+tissue_id+".xls")
+    ws_s = wb_s.sheet_by_index(0)
+
+    for i in range(1, ws_s.nrows):
+        if ws_s.cell_value(i,1) ==ID:
+            return i-1
+
+
+def read_stages(datapath,tissue_id):
+    wb_c = xl.open_workbook(datapath+"clinical"+tissue_id+".xls")
+    ws_c = wb_c.sheet_by_index(0) 
+    print(ws_c.nrows,"clinical tumors were detected.")
+
+    ind_stageI = []
+    ind_stageII = []
+    ind_stageIII = []
+    ind_stageIV = []
+
+    for i in range(1, ws_c.nrows):
+        if ws_c.cell_value(i,4) == 'stage i':
+            ind_stageI.append(read_index(ws_c.cell_value(i,0), datapath,tissue_id))
+        elif ws_c.cell_value(i,4) == 'stage ii':
+            ind_stageII.append(read_index(ws_c.cell_value(i,0), datapath,tissue_id))
+        elif ws_c.cell_value(i,4) == 'stage iii':
+            ind_stageIII.append(read_index(ws_c.cell_value(i,0), datapath,tissue_id))
+        elif ws_c.cell_value(i,4) == 'stage iv':
+            ind_stageIV.append(read_index(ws_c.cell_value(i,0), datapath,tissue_id))
+    wb_c.release_resources()
+    del wb_c
+
+    return ind_stageI, ind_stageII, ind_stageIII, ind_stageIV
+
+
 # Reading and processing the data ------------------------------------------
 
-print("Reading files from "+tissue_id+" databases:")
+print("\nReading files from "+tissue_id+" databases:")
 if(not isfile(datapath+"sample"+tissue_id+".xls")):
     print(tissue_id, "databases not found, please read", "'"+ datapath + "info.txt'")
     sys.exit()
 data, refTu, refTo, normal, tumor, genes_id = read_GEdata(datapath,tissue_id)
+ind_stageI, ind_stageII, ind_stageIII, ind_stageIV = read_stages(datapath,tissue_id)
 print("Data successfully loaded!")
 print("normal =", len(normal))
 print("tumor =", len(tumor))
@@ -185,7 +221,9 @@ if(lite_version):
     ax1[0].locator_params(axis='x',nbins=6),ax1[0].locator_params(axis='y',nbins=6), ax1[0].set_xlim(xmin,xmax), ax1[0].set_ylim(ymin,ymax)
     ax1[1].set_xlabel('Number of components'), ax1[1].set_ylabel('Cumulative variance (%)')
     ax1[1].set_xlim(0.,NgenS+0.2), ax1[1].set_ylim(0,102), ax1[1].locator_params(axis='x',nbins=5)  
+
     fig1.tight_layout()
+    fig1.savefig(tissue_id+'_PC1-2_fig.pdf')
 
    #Fig.2
     fig2 = plt.figure()
@@ -218,15 +256,55 @@ if(lite_version):
     ax2[0].locator_params(axis='x',nbins=6),ax2[1].set_xticks([10**-4, 10**-3, 10**-2,10**-1,1]),ax2[2].set_xticks([1, 10, 10**2,10**3,10**4])
     ax2[1].grid(which='major', ls='-'); ax2[2].grid(which='major', ls='-')
     ax2[1].grid(which='minor', ls='--'); ax2[2].grid(which='minor', ls='--')
-    fig2.tight_layout() 
-      
-    fig1.savefig(tissue_id+'_PC1-2_fig.pdf')
+
+    fig2.tight_layout()
     fig2.savefig(tissue_id + "_gene-dist_fig.pdf")
     np.savetxt(tissue_id+'gene-under_dat.dat', np.transpose([refTu[:Ng_maxU],range(1,Ng_maxU+1)]), 
     delimiter="\t\t", fmt="%s", header='under-expression\t\tNumber of genes')
     np.savetxt(tissue_id+'gene-over_dat.dat', np.transpose([refTu[:Ng_maxO],range(1,Ng_maxO+1)]), 
     delimiter="\t\t", fmt="%s", header='over-expression\t\tNumber of genes')
+
+   #Fig.3
+    plt.rcParams['lines.linewidth'] = 1.0
+    plt.rcParams['axes.labelsize'] = 11
+    plt.rcParams['xtick.labelsize'] = 11
+    plt.rcParams['ytick.labelsize'] = 11
+    plt.rcParams['legend.fontsize'] = 11
+    plt.rcParams['lines.markersize'] = 5.2
+    #plt.rcParams['xtick.minor.visible'] = True
+    #plt.rcParams['ytick.minor.visible'] = True
+    fig3, ax3 = plt.subplots(2,2,sharex='all', sharey='all')
+    f=0.95  
+    fig3.set_size_inches(f*2*4, f*2*3)
+    textF='large'
+    colors = ['royalblue','r','tab:orange','forestgreen','k']
+    al=0.7
+    xmin=-6;xmax=35
+    ymin=-21;ymax=45
+
+    ax3[0,0].scatter(projection[0,normal], -projection[1,normal],label=tissue_id+', normal', marker="o",c='b',alpha=al)
+    ax3[0,0].scatter(projection[0,ind_stageI], -projection[1,ind_stageI],label=tissue_id+', stage I', marker="s",c='r',alpha=al)
+    ax3[0,1].scatter(projection[0,normal], -projection[1,normal],label=tissue_id+', normal', marker="o",c='b',alpha=al)
+    ax3[0,1].scatter(projection[0,ind_stageII], -projection[1,ind_stageII],label=tissue_id+', stage II', marker="s",c='r',alpha=al)
+    ax3[1,0].scatter(projection[0,normal], -projection[1,normal],label=tissue_id+', normal', marker="o",c='b',alpha=al)
+    ax3[1,0].scatter(projection[0,ind_stageIII], -projection[1,ind_stageIII],label=tissue_id+', stage III', marker="s",c='r',alpha=al)
+    ax3[1,1].scatter(projection[0,normal], -projection[1,normal],label=tissue_id+', normal', marker="o",c='b',alpha=al)
+    ax3[1,1].scatter(projection[0,ind_stageIV], -projection[1,ind_stageIV],label=tissue_id+', stage IV', marker="s",c='r',alpha=al)
+
+    ax3[1,0].set_xlabel('PC1'), ax3[1,1].set_xlabel('PC1')
+    ax3[0,0].set_ylabel('-PC2'), ax3[1,0].set_ylabel('-PC2')
+    ax3[0,0].legend(bbox_to_anchor=(0., 1.), edgecolor='k',loc='upper left',borderaxespad=0.2)
+    ax3[0,1].legend(bbox_to_anchor=(0., 1.), edgecolor='k',loc='upper left',borderaxespad=0.2)
+    ax3[1,0].legend(bbox_to_anchor=(0., 1.), edgecolor='k',loc='upper left',borderaxespad=0.2)
+    ax3[1,1].legend(bbox_to_anchor=(0., 1.), edgecolor='k',loc='upper left',borderaxespad=0.2)
+    ax3[0,0].xaxis.set_minor_locator(AutoMinorLocator(2)),ax3[0,0].yaxis.set_minor_locator(AutoMinorLocator(2))
+    ax3[0,1].xaxis.set_minor_locator(AutoMinorLocator(2)),ax3[0,1].yaxis.set_minor_locator(AutoMinorLocator(2))
+    ax3[1,0].xaxis.set_minor_locator(AutoMinorLocator(2)),ax3[1,0].yaxis.set_minor_locator(AutoMinorLocator(2))
+    ax3[1,1].xaxis.set_minor_locator(AutoMinorLocator(2)),ax3[1,1].yaxis.set_minor_locator(AutoMinorLocator(2))
+    fig3.tight_layout()
+    fig3.savefig(tissue_id + "_stages_lite_fig.pdf")
+
 else:
     np.savetxt(outputpath+'pc'+tissue_id+'.xls', projection.T)
 
-print("Done!")
+print("Done!\n")
