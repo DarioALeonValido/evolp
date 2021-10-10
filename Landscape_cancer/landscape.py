@@ -107,6 +107,13 @@ def find_stage(ID, clinical_ws):
         if clinical_ws.cell_value(i,0) == ID:
             return clinical_ws.cell_value(i,4)
 
+def same_stage(stage, s):
+    same_stage = False
+    if (stage=='Stage '+s or stage=='Stage '+s+'A' or stage=='Stage '+s+'B' or stage=='Stage '+s+'C'):
+        same_stage = True
+
+    return same_stage
+
 def read_PC_clinical(sample_path,PC_path,tissue_id,initpc,Npc):
     ind_normal = []
     ind_tumor = []
@@ -129,10 +136,11 @@ def read_PC_clinical(sample_path,PC_path,tissue_id,initpc,Npc):
             ind_normal.append(i)
         else:
             ind_tumor.append(i)
-            if find_stage(sample_ws.cell_value(i+1,1), clinical_ws) == 'stage i': ind_stageI.append(i)
-            elif find_stage(sample_ws.cell_value(i+1,1), clinical_ws) == 'stage ii': ind_stageII.append(i)
-            elif find_stage(sample_ws.cell_value(i+1,1), clinical_ws) == 'stage iii': ind_stageIII.append(i)
-            elif find_stage(sample_ws.cell_value(i+1,1), clinical_ws) == 'stage iv': ind_stageIV.append(i)            
+            #if find_stage(sample_ws.cell_value(i+1,1), clinical_ws) == 'Stage I': ind_stageI.append(i)
+            if same_stage(find_stage(sample_ws.cell_value(i+1,1), clinical_ws),'I'): ind_stageI.append(i)
+            elif same_stage(find_stage(sample_ws.cell_value(i+1,1), clinical_ws),'II'): ind_stageII.append(i)
+            elif same_stage(find_stage(sample_ws.cell_value(i+1,1), clinical_ws),'III'): ind_stageIII.append(i)
+            elif same_stage(find_stage(sample_ws.cell_value(i+1,1), clinical_ws),'IV'): ind_stageIV.append(i)            
         pc_data.append([])
         for j in range(initpc-1,initpc-1+Npc):    
             pc_data[i].append(pc_ws.cell_value(i,j))
@@ -238,8 +246,6 @@ def compute_density(pc_data,dev,ranges,npoints):
     axis_pc1 = np.linspace(ranges[0][0],ranges[0][1],npoints[0])
     axis_pc2 = np.linspace(ranges[1][0],ranges[1][1],npoints[1])
     tot_density = np.zeros((len(axis_pc2),len(axis_pc1)))
-    print('axis_pc1,2',len(axis_pc1),len(axis_pc2))
-    print('tot_density',len(tot_density))
     for index in range(len(pc_data)):
         for i in range(len(axis_pc1)):
             for j in range(len(axis_pc2)):
@@ -487,6 +493,7 @@ fig4.tight_layout()
 fig4.savefig(tissue_id + "_stages_fig.pdf")
 
 # plotting fig 4 with generated data ----------------------------
+tissue_id = 'LIHC'
 fig4g, axs4g = plt.subplots(2,2,sharex='all', sharey='all')
 f=0.95  
 fig4g.set_size_inches(f*2*4, f*2*3.8)
@@ -494,9 +501,20 @@ al=0.7
 
 dev=30.
 
+#KIRC
 dev=[40.,50.]
 ranges=[[-50.,300.],[-140.,430.]]
 npoints=[36,58]
+
+#KIRP&LUSC
+dev=[40.,50.]
+ranges=[[-50.,300.],[-180.,250.]]
+npoints=[36,44]
+
+#LIHC
+dev=[40.,50.]
+ranges=[[-80.,300.],[-180.,250.]]
+npoints=[39,44]
 
 pc_data,ind_normal,ind_tumor,ind_stageI,ind_stageII,ind_stageIII,ind_stageIV = read_PC_clinical(sample_path,PC_path,tissue_id,initpc,NpcP)
 sign1=pc_sign(pc_data[ind_tumor,0]);sign2=-pc_sign(pc_data[ind_tumor,1])
@@ -558,6 +576,7 @@ axs4g[0,0].xaxis.set_minor_locator(AutoMinorLocator(2)),axs4g[0,0].yaxis.set_min
 axs4g[0,1].xaxis.set_minor_locator(AutoMinorLocator(2)),axs4g[0,1].yaxis.set_minor_locator(AutoMinorLocator(2))
 axs4g[1,0].xaxis.set_minor_locator(AutoMinorLocator(2)),axs4g[1,0].yaxis.set_minor_locator(AutoMinorLocator(2))
 axs4g[1,1].xaxis.set_minor_locator(AutoMinorLocator(2)),axs4g[1,1].yaxis.set_minor_locator(AutoMinorLocator(2))
+#fig4g.colorbar()
 fig4g.tight_layout()
 fig4g.savefig(tissue_id + "_g_stages_fig.pdf")
 
