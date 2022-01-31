@@ -22,6 +22,7 @@ initpc = 1
 lifetime=80
 tissue_id = 'COAD'
 tissues_PCA = ['BRCA','COAD','ESCA','HNSC','LIHC','LUAD','PRAD','THCA']
+tissues_PCA_b = ['BRCA','COAD','ESCA','HNSC','LIHC','PRAD']
 tissues_CLRm = ['Breast','Colorectal','Esophageal','Head&Neck','Hepatocellular','Lung','Prostate','Thyroid_Papillary']
 tissues_CLRr = ['breast','colorectal','esophageal','head & neck','hepatocellular','lung','prostate','thyroid follicular']
 
@@ -150,6 +151,7 @@ risk_m = risk_m/Nsc     #risk per stem cell
 aref = 2e-14            #reference value
 ERS = risk_m/(aref*t_m) #extra risk score
 
+
 print("Done!\n\nLoading TCGA Principal Componets for:") #working with PCA data
 pc_data,ind_normal,ind_tumor = read_PC(sample_path,PC_path,tissue_id,initpc,Npc)
 pc,mfitness = fitness_dist(-pc_data[:,0],ind_normal,ind_tumor,1.,1.5,5,16)
@@ -166,11 +168,15 @@ for t_clr in tissues_CLRr:
         if t_clr in nameCLRr[i]: indexes_r.append(i)
 
 log_risk = np.log(risk_r[indexes_r]/Nsc[indexes_m])
+log_error = np.log((risk_r[indexes_r]+error_r[indexes_r])/Nsc[indexes_m]) - log_risk
 
 x_brownian=np.array(-2*(D*t_m[indexes_m]**0.5/R)**-2+np.log(D*t_m[indexes_m]**0.5/R), dtype="f")  
 x_levy = np.array(np.log(D*t_r[indexes_m]/R), dtype="f")  
-m_brownian, b_brownian=np.polyfit(x_brownian,log_risk,1) #Linear fit for Brownian
-m_levy=1; n_levy=np.mean(log_risk-m_levy*x_levy)         #Linear fit for Levy jumps
+m_brownian, n_brownian=np.polyfit(x_brownian,log_risk,1) #Linear fit for Brownian
+x_brownian_new = np.delete(x_brownian, (5,7))
+log_risk_new = np.delete(log_risk, (5,7))
+m_brownian_b, n_brownian_b=np.polyfit(x_brownian_new,log_risk_new,1) #Linear fit for Brownian_b
+m_levy, n_levy=np.polyfit(x_levy,log_risk,1)                         #Linear fit for Levy jumps
 
 
 # Exporting readable data ------------------------------------------------------
@@ -252,29 +258,63 @@ plt.savefig('ge'+tissue_id+'_fitness_fig.pdf')
 plt.clf()
 
 # plotting Brownian and Levy Correlation ----------------------------
-plt.scatter(x_brownian, log_risk, label = 'Data')
+
+plt.rcParams['lines.linewidth'] = 1.5
+plt.rcParams['axes.labelsize'] = 16
+plt.rcParams['xtick.labelsize'] = 14
+plt.rcParams['ytick.labelsize'] = 14
+plt.rcParams['legend.fontsize'] = 14
+plt.rcParams['lines.markersize'] = 6.
+fs=13
+plt.ticklabel_format(axis='x', style='sci',scilimits=(4,4),useMathText=True)
+
+x_shifts=[1.1,0,0,-1.05,-0.9,1.1,-1.05,0]
+y_shifts=[-0.15,-0.40,-0.45,0,-0.15,-0.15,-0.15,0.15]
+
+plt.scatter(x_brownian, log_risk, label = 'Data',c='b')
 for i in range(len(x_brownian)):
-    plt.annotate(tissues_PCA[i], (x_brownian[i], log_risk[i]), ha='center')
+    plt.annotate(tissues_PCA[i], (x_brownian[i]+x_shifts[i]*1e4, log_risk[i]+y_shifts[i]), ha='center',fontsize=fs)
 
 plt.plot([np.min(x_brownian),np.max(x_brownian)], 
-[m_brownian*np.min(x_brownian),m_brownian*np.max(x_brownian)]+b_brownian,
-color='r', label='Linear fit', linestyle='dashed')
+[m_brownian*np.min(x_brownian),m_brownian*np.max(x_brownian)]+n_brownian,
+color='r', label='$-$'+str(abs(round(n_brownian,1)))+'$+$'+str(round(1e5*m_brownian,1))+r'$\times 10^{-5} x$', linestyle='--')
 
-plt.xlabel('-2(Dt^0.5/R)^-2 + ln(Dt^0.5/R)')
-plt.ylabel('ln(Risk/Nsc)')
+plt.plot([np.min(x_brownian_new),np.max(x_brownian_new)], 
+[m_brownian_b*np.min(x_brownian_new),m_brownian_b*np.max(x_brownian_new)]+n_brownian_b,
+color='orange', label='$-$'+str(abs(round(n_brownian_b,1)))+'$+$'+str(round(1e4*m_brownian_b,1))+r'$\times 10^{-4} x$', linestyle='-.')
+
+plt.xlabel('$x = -2(D \sqrt{t} /R)^{-2} + ln(D \sqrt{t} /R)$')
+plt.ylabel(r'$ln(Risk/N_{sc})$')
+plt.xlim(-16.9*1e4,1.2*1e4)
+plt.ylim(-28.1,-20.4)
 plt.tight_layout()
-plt.legend(loc=3)
+plt.legend(loc=2)
 plt.savefig('risk-brownian_fig.pdf')
 plt.clf()
 
-plt.scatter(x_levy, log_risk, label = 'Data')
-for i in range(len(x_levy)):
-    plt.annotate(tissues_PCA[i], (x_levy[i], log_risk[i]), ha='center')
-plt.plot([np.min(x_levy),np.max(x_levy)], m_levy*[np.min(x_levy),np.max(x_levy)]+n_levy,
-color='r', label=str(n_levy)+'+'+str(m_levy)+'x', linestyle='dashed')
+#.............................................................
 
-plt.xlabel('ln(Dt/R)')
-plt.ylabel('ln(Risk/Nsc)')
+plt.rcParams['lines.linewidth'] = 1.5
+plt.rcParams['axes.labelsize'] = 16
+plt.rcParams['xtick.labelsize'] = 14
+plt.rcParams['ytick.labelsize'] = 14
+plt.rcParams['legend.fontsize'] = 14
+plt.rcParams['lines.markersize'] = 6.
+fs=13
+
+x_shifts=[0.35,-0.38,0,0.35,0.30,0.35,-0.35,0.35]
+y_shifts=[-0.15,-0.18,0.15,-0.15,-0.15,-0.15,-0.15,-0.15]
+
+plt.errorbar(x_levy, log_risk, yerr=log_error, uplims=True, lolims=True, label = 'Data',c='b', ecolor='gray',ls='',marker='o')
+for i in range(len(x_levy)):
+    plt.annotate(tissues_PCA[i], (x_levy[i]+x_shifts[i], log_risk[i]+y_shifts[i]), ha='center',fontsize=fs)
+plt.plot([np.min(x_levy),np.max(x_levy)], [m_levy*np.min(x_levy),m_levy*np.max(x_levy)]+n_levy,
+color='r', label='$-$'+str(abs(round(n_levy,1)))+'$+$'+str(round(m_levy,1))+'$x$', linestyle='dashed')
+
+
+plt.xlabel('$x = ln(D t/R)$')
+plt.ylabel(r'$ln(Risk/N_{sc})$')
+plt.xlim(-4.1,2.05)
 plt.tight_layout()
 plt.legend(loc=4)
 plt.savefig('risk-levy_fig.pdf')

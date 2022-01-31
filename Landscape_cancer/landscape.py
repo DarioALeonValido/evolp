@@ -231,6 +231,21 @@ def read_tot_density(tissue_id,td_path):
 
     return axis_pc1, axis_pc2, tot_density.T 
 
+def read_meanPCA(label):
+    file = open('mean-'+label+'_save_dat.dat', 'r')
+    lines = file.readlines()
+
+    tissues = []; mean_pc1 = []; mean_pc3 = []     
+    for line in lines[1:]:
+        tissues.append(line.split()[0])
+        mean_pc1.append(line.split()[1])
+        mean_pc3.append(line.split()[3])
+    tissues = np.array(tissues)
+    mean_pc1 = np.array(mean_pc1, np.float)
+    mean_pc3 = np.array(mean_pc3, np.float)
+  
+    return tissues, mean_pc1, mean_pc3
+
 def multi_gaussian_dist(mean,dev,coordinates):
     # this is a multivariate gaussian distribution of uncorrelated coordinates
     f = 1.
@@ -579,6 +594,56 @@ axs4g[1,1].xaxis.set_minor_locator(AutoMinorLocator(2)),axs4g[1,1].yaxis.set_min
 #fig4g.colorbar()
 fig4g.tight_layout()
 fig4g.savefig(tissue_id + "_g_stages_fig.pdf")
+
+
+# Settings for fig 5 ---------------------------------------------------------------
+mpl.style.use
+plt.rcParams['lines.linewidth'] = 1.0
+plt.rcParams['axes.labelsize'] = 17
+plt.rcParams['xtick.labelsize'] = 17
+plt.rcParams['ytick.labelsize'] = 17
+plt.rcParams['legend.fontsize'] = 17
+plt.rcParams['lines.markersize'] = 7.5
+fs=16
+
+# plotting fig 5 ----------------------------
+fig5, axs5 = plt.subplots()
+
+ranges=[[-140.,190.],[-145.,160.]]
+npoints=[34,31]
+
+tissues_n, mean_pc1_n, mean_pc3_n = read_meanPCA('Normal')
+tissues_t, mean_pc1_t, mean_pc3_t = read_meanPCA('Tumor')
+
+dev=[28.,28.]
+pc1_normal, pc2_normal, density_normal = compute_density(np.transpose([mean_pc1_n, mean_pc3_n]),dev,ranges,npoints)
+dev=[28.,28.]
+pc1_tumor, pc2_tumor, density_tumor = compute_density(np.transpose([mean_pc1_t, mean_pc3_t]),dev,ranges,npoints)
+grid_pc1, grid_pc2 = np.meshgrid(pc1_tumor, pc2_tumor)
+tot_density = (density_tumor - density_normal)#/1.5
+
+colormap='RdBu_r'#'bwr'#'RdBu_r'#'seismic'#'coolwarm'
+npoints=30
+axs5.contourf(grid_pc1, grid_pc2, tot_density, npoints, cmap=colormap)
+axs5.contourf(grid_pc1, grid_pc2, tot_density, npoints, cmap=colormap)
+
+axs5.scatter(mean_pc1_n, mean_pc3_n, label='Normal',c='b', alpha=0.7)
+axs5.scatter(mean_pc1_t, mean_pc3_t, label='Tumor',c='r', marker="s", alpha=0.7)
+
+#        ['BLCA',  'BRCA', 'COAD', 'ESCA', 'HNSC',  'KIRC',   'KIRP', 'LIHC', 'LUAD', 'LUSC', 'PRAD',  'READ', 'STAD',  'THCA', 'UCEC']
+shifts_n=[[ 10,   6],[-24,    0],[18,  5],[-14,  5],[-8,5],[-14, 5],[-14,-18],[ 0, 5],[-23,-7],[-10, 5],[23,-12],[-17,  5],[0,5],[-20,-13],[-24, -3]]
+shifts_t=[[22.5,-14],[-15,-18.5],[25.5,-12],[  9,-18.5],[ 8,5.5],[ 21,-7],[ -10,-19],[20,-2],[ 15, 6],[22.5,-10],[23.5, -4.5],[-17,-19],[8,6],[ 18, -19],[ 12,-19]]
+
+for i in range(len(tissues_n)):
+    axs5.annotate(tissues_n[i], (mean_pc1_n[i]+shifts_n[i][0], mean_pc3_n[i]+shifts_n[i][1]), ha='center',fontsize=fs)
+    axs5.annotate(tissues_t[i], (mean_pc1_t[i]+shifts_t[i][0], mean_pc3_t[i]+shifts_t[i][1]), ha='center',fontsize=fs)
+axs5.legend(bbox_to_anchor=(0., 1.), edgecolor='k',loc='upper left',borderaxespad=0.2)
+
+axs5.set_xlabel('PC1')
+axs5.set_ylabel('PC3')
+plt.tight_layout()
+fig5.savefig('landscape_t'+str(len(tissues_n))+'_fig.pdf')
+
 
 print("Done!\n")
 print("Check out the outputs!\n")
