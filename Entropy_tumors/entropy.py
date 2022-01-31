@@ -56,7 +56,7 @@ def compute_entropy(pc_dataset):
     coreM=pc_dataset.T
     cov_mat=np.cov(coreM,ddof=1)
     mean=np.mean(coreM,axis=1)
-    stdev=np.std(coreM,axis=1)
+    #stdev=np.std(coreM,axis=1)
     u,ss,vh =np.linalg.svd(cov_mat)
     s=np.diag(ss)
     cov_inv=np.matmul(np.matmul(vh.T,np.linalg.inv(s)),u.T)
@@ -64,6 +64,28 @@ def compute_entropy(pc_dataset):
     S_dataset=0.5*(sum_log + Npc*(1 + math.log(2*math.pi)))
 
     return S_dataset,mean,cov_mat,cov_inv
+
+
+def compute_PCranges(pc_dataset):
+
+    coreM=pc_dataset.T
+    cov_mat=np.cov(coreM,ddof=1)
+    mean=np.mean(coreM,axis=1)
+    minimum=np.min(coreM,axis=1)
+    maximum=np.max(coreM,axis=1)
+
+    return mean,minimum,maximum,cov_mat
+
+
+def compute_gaussianS(mean,cov_mat):
+
+    u,ss,vh =np.linalg.svd(cov_mat)
+    s=np.diag(ss)
+    cov_inv=np.matmul(np.matmul(vh.T,np.linalg.inv(s)),u.T)
+    sum_log=sum(math.log(s[i][i]) for i in range(Npc))
+    entropy=0.5*(sum_log + Npc*(1 + math.log(2*math.pi)))
+
+    return entropy
 
 
 def compute_overlap(Npc,mean_n,mean_t,cov_mat_n,cov_mat_t,cov_inv_n,cov_inv_t):
@@ -133,7 +155,6 @@ if __name__ == "__main__":
         lnI_samp_min_mean.append(np.mean(lnI_i))
         lnI_samp_min_std.append(np.std(lnI_i))
 
-
         S_n,mean_n,cov_mat_n,cov_inv_n=compute_entropy(pc_normal)
         S_normal.append(S_n)
         S_t,mean_t,cov_mat_t,cov_inv_t=compute_entropy(pc_tumor)
@@ -158,19 +179,20 @@ if __name__ == "__main__":
         S_delta_samp.append(S_tumor_samp_mean[-1]-S_normal[-1])
         S_delta_samp_min.append(S_tumor_samp_min_mean[-1]-S_normal_samp_mean[-1])
 
+
     np.savetxt('entropies_dat.dat', np.transpose([tissues_id,N_normal,N_tumor,S_normal,S_tumor,S_delta,
-                                    I,lnI]),
-    header='tissue\tNnormal\tNtumor\tSn\t\t\tSt\t\t\tdeltaS\t\t\tI\t\t\t-ln(I)',
+                                    lnI,I]),
+    header='tissue\tNnormal Ntumor\tSn\t\t\tSt\t\t\tdeltaS\t\t\t-ln(I)\t\t\tI',
     comments='', delimiter=" \t", fmt="%s")
     np.savetxt('entropies_samp-'+str(Nn_min)+'_dat.dat', np.transpose([tissues_id,N_normal,N_tumor,
     S_normal_samp_mean,S_normal_samp_std,S_tumor_samp_min_mean,S_tumor_samp_min_std,S_delta_samp_min,
     lnI_samp_min_mean,lnI_samp_min_std]),
-    header='tissue\tNnormal\tNtumor\t<Sn>_'+str(Nn_min)+'\t\t\tstd(Sn)_'+str(Nn_min)+'\t\t<St>_'+
-    str(Nn_min)+'\t\t\tstd(St)_'+str(Nn_min)+'\t\t<St>-<Sn>\t\t-<lnI>_'+str(Nn_min)+'\t\tstd(lnI)_'+
-    str(Nn_min),comments='',delimiter=" \t",fmt="%s")
+    header='tissue\tNnormal Ntumor\t<Sn>_'+str(Nn_min)+'\t\tstd(Sn)_'+str(Nn_min)+'\t\t<St>_'+
+    str(Nn_min)+'\t\tstd(St)_'+str(Nn_min)+'\t\t<St>-<Sn>\t\t-<lnI>_'+str(Nn_min)+'\t\tstd(lnI)_'+
+    str(Nn_min),comments='',delimiter="\t",fmt="%s")
     np.savetxt('entropies_samp-Nn_dat.dat', np.transpose([tissues_id,N_normal,N_tumor,S_normal,
     S_tumor_samp_mean,S_tumor_samp_std,S_delta_samp,lnI_samp_mean,lnI_samp_std]),
-    header='tissue\tNnormal\tNtumor\tSn\t\t\t<St>_Nn\t\t\tstd(St)_Nn\t\t<St>-Sn\t\t\t-<lnI>_Nn'+
+    header='tissue\tNnormal Ntumor\tSn\t\t\t<St>_Nn\t\tstd(St)_Nn\t\t<St>-Sn\t\t-<lnI>_Nn'+
     '\t\tstd(lnI)_Nn',comments='',delimiter=" \t",fmt="%s")
 
 
@@ -221,6 +243,24 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig('entropy_samp_map_fig.pdf')
     plt.clf()
+
+
+#   Monte Carlo deailed balance --------------------------------
+    t_id='BRCA'
+    pc_normal,pc_tumor=read_PC(sample_path,PC_path,t_id,Npc)
+    print('normal/tumor:',len(pc_normal),'/',len(pc_tumor))
+    print('PCs:',str(len(pc_normal[0]))+'x'+str(len(pc_tumor[0])))
+
+    mean_n,min_n,max_n,cov_mat_n=compute_PCranges(pc_normal)
+    S_n=compute_gaussianS(mean_n,cov_mat_n)
+    mean_t,min_t,max_t,cov_mat_t=compute_PCranges(pc_tumor)
+    S_t=compute_gaussianS(mean_t,cov_mat_t)
+
+    np.savetxt('PCranges_dat.dat', np.transpose([min_n,max_n,mean_n,min_t,max_t,mean_t]),
+    header='min_n\t\t\t  max_n\t\t  mean_n\t\t\t  min_t\t\t  max_t\t\t  mean_t',
+    comments='', delimiter="\t  ", fmt="%s")
+
+#   --------------------------------
 
 print("Done!\n")
 print("Check out the outputs!\n")
