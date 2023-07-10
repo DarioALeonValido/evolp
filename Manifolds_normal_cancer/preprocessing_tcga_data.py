@@ -12,10 +12,9 @@ databases_path = Path(r'..\databases_external\TCGA')
 output_path = Path('output')
 
 for tissue in tissues:
-    sample_path = databases_path / f'data{tissue}'
-    data_path = databases_path / f'data{tissue}' / 'data'
+    data_path = databases_path / f'data{tissue}' 
 
-    sample = pd.read_excel(sample_path / 'sample.xls')
+    sample = pd.read_excel(databases_path / f'sample{tissue}.xls')
     normal = sample['Sample Type'] == 'Solid Tissue Normal'
     tumor = sample['Sample Type'] != 'Solid Tissue Normal'
 
