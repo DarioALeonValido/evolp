@@ -9,7 +9,6 @@ from mpl_toolkits.mplot3d import proj3d
 from pathlib import Path
 from scipy.stats.mstats import gmean
 
-sns.set(style="darkgrid")
 
 # Set output path
 output_path = Path('output')
